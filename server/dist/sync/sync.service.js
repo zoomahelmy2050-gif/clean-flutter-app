@@ -8,9 +8,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var SyncService_1;
-var _a;
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 let SyncService = SyncService_1 = class SyncService {
     prisma;
     logger = new Logger(SyncService_1.name);
@@ -78,7 +77,7 @@ let SyncService = SyncService_1 = class SyncService {
                     data: {
                         status: 'failed',
                         retryCount: { increment: 1 },
-                        error: error.message,
+                        error: error?.message || 'Unknown error',
                     },
                 });
                 results.push({ id: item.id, success: false, error: error.message });
@@ -196,7 +195,7 @@ let SyncService = SyncService_1 = class SyncService {
 };
 SyncService = SyncService_1 = __decorate([
     Injectable(),
-    __metadata("design:paramtypes", [typeof (_a = typeof PrismaService !== "undefined" && PrismaService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [PrismaService])
 ], SyncService);
 export { SyncService };
 //# sourceMappingURL=sync.service.js.map

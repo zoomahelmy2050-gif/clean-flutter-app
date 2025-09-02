@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { SyncController } from './sync.controller';
-import { SyncService } from './sync.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { SyncController } from './sync.controller.js';
+import { SyncService } from './sync.service.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 
 @Module({
   imports: [PrismaModule],

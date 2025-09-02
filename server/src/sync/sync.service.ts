@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
 export class SyncService {
@@ -71,7 +71,7 @@ export class SyncService {
         });
 
         results.push({ id: item.id, success: true, result });
-      } catch (error) {
+      } catch (error: any) {
         this.logger.error(`Sync failed for item ${item.id}`, error);
         
         // Update retry count and status
@@ -80,7 +80,7 @@ export class SyncService {
           data: {
             status: 'failed',
             retryCount: { increment: 1 },
-            error: error.message,
+            error: error?.message || 'Unknown error',
           },
         });
 

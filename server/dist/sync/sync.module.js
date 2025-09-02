@@ -5,9 +5,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { Module } from '@nestjs/common';
-import { SyncController } from './sync.controller';
-import { SyncService } from './sync.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { SyncController } from './sync.controller.js';
+import { SyncService } from './sync.service.js';
+import { PrismaModule } from '../prisma/prisma.module.js';
 let SyncModule = class SyncModule {
 };
 SyncModule = __decorate([

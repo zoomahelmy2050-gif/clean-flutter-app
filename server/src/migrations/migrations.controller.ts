@@ -1,23 +1,23 @@
 import { Controller, Get, Post, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
-import { MigrationsService } from './migrations.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { MigrationsService } from './migrations.service.js';
+import { JwtGuard } from '../auth/jwt.guard.js';
 
 @Controller('migrations')
 export class MigrationsController {
   constructor(private migrationsService: MigrationsService) {}
 
   @Get('status')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGuard)
   async getStatus() {
     return this.migrationsService.getMigrationStatus();
   }
 
   @Post('apply')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGuard)
   async applyMigrations() {
     try {
       return await this.migrationsService.applyMigrations();
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(
         error.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -26,11 +26,11 @@ export class MigrationsController {
   }
 
   @Post('reset')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtGuard)
   async resetDatabase() {
     try {
       return await this.migrationsService.resetDatabase();
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(
         error.message,
         HttpStatus.FORBIDDEN,

@@ -7,10 +7,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a;
 import { Controller, Get, Post, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
-import { MigrationsService } from './migrations.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { MigrationsService } from './migrations.service.js';
+import { JwtGuard } from '../auth/jwt.guard.js';
 let MigrationsController = class MigrationsController {
     migrationsService;
     constructor(migrationsService) {
@@ -38,28 +37,28 @@ let MigrationsController = class MigrationsController {
 };
 __decorate([
     Get('status'),
-    UseGuards(JwtAuthGuard),
+    UseGuards(JwtGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], MigrationsController.prototype, "getStatus", null);
 __decorate([
     Post('apply'),
-    UseGuards(JwtAuthGuard),
+    UseGuards(JwtGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], MigrationsController.prototype, "applyMigrations", null);
 __decorate([
     Post('reset'),
-    UseGuards(JwtAuthGuard),
+    UseGuards(JwtGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], MigrationsController.prototype, "resetDatabase", null);
 MigrationsController = __decorate([
     Controller('migrations'),
-    __metadata("design:paramtypes", [typeof (_a = typeof MigrationsService !== "undefined" && MigrationsService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [MigrationsService])
 ], MigrationsController);
 export { MigrationsController };
 //# sourceMappingURL=migrations.controller.js.map

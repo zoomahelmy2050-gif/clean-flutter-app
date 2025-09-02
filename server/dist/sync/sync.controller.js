@@ -10,10 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a;
-import { Controller, Get, Post, Body, UseGuards, Req } from '@nestjs/common';
-import { SyncService } from './sync.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Controller, Get, Post, Body, UseGuards, Req, Request } from '@nestjs/common';
+import { SyncService } from './sync.service.js';
+import { JwtGuard } from '../auth/jwt.guard.js';
 let SyncController = class SyncController {
     syncService;
     constructor(syncService) {
@@ -31,7 +30,7 @@ let SyncController = class SyncController {
             ...data,
         });
     }
-    async processQueue(req) {
+    async getQueue(req) {
         return this.syncService.processSyncQueue(req.user.id);
     }
     async cleanup() {
@@ -40,7 +39,7 @@ let SyncController = class SyncController {
 };
 __decorate([
     Get('status'),
-    UseGuards(JwtAuthGuard),
+    UseGuards(JwtGuard),
     __param(0, Req()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -48,16 +47,16 @@ __decorate([
 ], SyncController.prototype, "getSyncStatus", null);
 __decorate([
     Get('pending'),
-    UseGuards(JwtAuthGuard),
-    __param(0, Req()),
+    UseGuards(JwtGuard),
+    __param(0, Request()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], SyncController.prototype, "getPendingItems", null);
 __decorate([
     Post('queue'),
-    UseGuards(JwtAuthGuard),
-    __param(0, Req()),
+    UseGuards(JwtGuard),
+    __param(0, Request()),
     __param(1, Body()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
@@ -65,22 +64,22 @@ __decorate([
 ], SyncController.prototype, "addToQueue", null);
 __decorate([
     Post('process'),
-    UseGuards(JwtAuthGuard),
-    __param(0, Req()),
+    UseGuards(JwtGuard),
+    __param(0, Request()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], SyncController.prototype, "processQueue", null);
+], SyncController.prototype, "getQueue", null);
 __decorate([
     Post('cleanup'),
-    UseGuards(JwtAuthGuard),
+    UseGuards(JwtGuard),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], SyncController.prototype, "cleanup", null);
 SyncController = __decorate([
     Controller('sync'),
-    __metadata("design:paramtypes", [typeof (_a = typeof SyncService !== "undefined" && SyncService) === "function" ? _a : Object])
+    __metadata("design:paramtypes", [SyncService])
 ], SyncController);
 export { SyncController };
 //# sourceMappingURL=sync.controller.js.map

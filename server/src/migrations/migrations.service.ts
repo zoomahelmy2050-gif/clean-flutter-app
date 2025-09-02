@@ -28,7 +28,7 @@ export class MigrationsService {
         prismaStatus: stdout,
         databaseConnected: true,
       };
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Failed to get migration status', error as Error);
       return {
         migrations: [],
@@ -63,8 +63,8 @@ export class MigrationsService {
         output: stdout,
         error: stderr,
       };
-    } catch (error) {
-      this.logger.error('Failed to apply migrations', error);
+    } catch (error: any) {
+      this.logger.error('Failed to apply migrations', error as Error);
       
       // Record failed migration
       await this.prisma.migration.create({
@@ -97,8 +97,8 @@ export class MigrationsService {
         success: true,
         message: `Migration ${version} rolled back`,
       };
-    } catch (error) {
-      this.logger.error('Failed to rollback migration', error);
+    } catch (error: any) {
+      this.logger.error('Failed to rollback migration', error as Error);
       throw error;
     }
   }
@@ -120,8 +120,8 @@ export class MigrationsService {
         success: true,
         output: stdout,
       };
-    } catch (error) {
-      this.logger.error('Failed to reset database', error);
+    } catch (error: any) {
+      this.logger.error('Failed to reset database', error as Error);
       throw error;
     }
   }
