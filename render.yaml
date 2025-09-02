@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     rootDirectory: server
-    buildCommand: npm install --production=false && node node_modules/.bin/prisma generate && node node_modules/.bin/tsc -p .
+    buildCommand: npm install --production=false && node node_modules/prisma/build/index.js generate && node node_modules/typescript/lib/tsc.js -p .
     startCommand: npm start
     envVars:
       - key: NODE_ENV
