@@ -4,8 +4,8 @@ services:
     runtime: node
     plan: free
     rootDirectory: server
-    buildCommand: npm install && npm run build
-    startCommand: npm run start:prod
+    buildCommand: npm install --production=false && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
