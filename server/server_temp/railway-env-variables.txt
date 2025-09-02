@@ -1,0 +1,20 @@
+# Railway Environment Variables
+# Copy these to your Railway project settings > Variables
+
+NODE_ENV=production
+PORT=3000
+JWT_SECRET=your-generated-jwt-secret-here
+
+# Database URL will be automatically provided by Railway PostgreSQL service
+# DATABASE_URL=postgresql://username:password@hostname:port/database
+
+# CORS Configuration (update with your actual domains)
+CORS_ORIGINS=http://localhost:3000,https://your-flutter-app.netlify.app
+
+# Optional: Email Configuration
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USERNAME=your-email@gmail.com
+# SMTP_PASSWORD=your-app-password
+# SMTP_FROM=your-email@gmail.com
+# SMTP_FROM_NAME=Security Center
