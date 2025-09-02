@@ -9,7 +9,7 @@
     "build:render": "npx --yes prisma generate && tsc -p .",
     "start": "node dist/main.js",
     "start:migrate": "npx prisma migrate deploy && node dist/main.js",
-    "prisma:generate": "npx prisma generate",
+    "prisma:generate": "node node_modules/prisma/build/index.js generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:reset": "prisma migrate reset --force"
