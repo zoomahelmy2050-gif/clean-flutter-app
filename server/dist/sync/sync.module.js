@@ -8,11 +8,12 @@ import { Module } from '@nestjs/common';
 import { SyncController } from './sync.controller.js';
 import { SyncService } from './sync.service.js';
 import { PrismaModule } from '../prisma/prisma.module.js';
+import { AuthModule } from '../auth/auth.module.js';
 let SyncModule = class SyncModule {
 };
 SyncModule = __decorate([
     Module({
-        imports: [PrismaModule],
+        imports: [PrismaModule, AuthModule],
         controllers: [SyncController],
         providers: [SyncService],
         exports: [SyncService],
