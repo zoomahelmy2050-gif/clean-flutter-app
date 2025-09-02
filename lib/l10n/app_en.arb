@@ -1,0 +1,630 @@
+{
+  "@@locale": "en",
+  "appTitle": "Security Center",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Welcome back message"
+  },
+  "loginSubtitle": "Log in to your account to continue",
+  "@loginSubtitle": {
+    "description": "Login page subtitle"
+  },
+  "usernameOrEmail": "Username or Email",
+  "@usernameOrEmail": {
+    "description": "Username or email field label"
+  },
+  "enterEmailValidation": "Enter email",
+  "@enterEmailValidation": {
+    "description": "Email validation message"
+  },
+  "enterPasswordValidation": "Enter password",
+  "@enterPasswordValidation": {
+    "description": "Password validation message"
+  },
+  "rememberMe": "Remember me",
+  "@rememberMe": {
+    "description": "Remember me checkbox label"
+  },
+  "signInWithGoogle": "Sign in with Google",
+  "@signInWithGoogle": {
+    "description": "Google sign in button"
+  },
+  "signInWithPhone": "Sign in with Phone",
+  "@signInWithPhone": {
+    "description": "Phone sign in button"
+  },
+  "useBackupCode": "Use a backup code",
+  "@useBackupCode": {
+    "description": "Backup code login button"
+  },
+  "dontHaveAccount": "Don't have an account? ",
+  "@dontHaveAccount": {
+    "description": "Sign up prompt text"
+  },
+  "or": "or",
+  "@or": {
+    "description": "Or divider text"
+  },
+  "createAccount": "Create Account",
+  "@createAccount": {
+    "description": "Create account title"
+  },
+  "fullName": "Full Name",
+  "@fullName": {
+    "description": "Full name field label"
+  },
+  "enterName": "Enter your name",
+  "@enterName": {
+    "description": "Name field validation"
+  },
+  "accountSettings": "Account Settings",
+  "@accountSettings": {
+    "description": "Account settings tab title"
+  },
+  "twoFactorAuth": "Two-Factor Authentication",
+  "@twoFactorAuth": {
+    "description": "2FA settings label"
+  },
+  "biometricAuth": "Biometric Authentication",
+  "@biometricAuth": {
+    "description": "Biometric auth settings label"
+  },
+  "backupCodes": "Backup Codes",
+  "@backupCodes": {
+    "description": "Backup codes label"
+  },
+  "generateCodes": "Generate Codes",
+  "@generateCodes": {
+    "description": "Generate backup codes button"
+  },
+  "viewCodes": "View Codes",
+  "@viewCodes": {
+    "description": "View backup codes button"
+  },
+  "exportData": "Export Data",
+  "@exportData": {
+    "description": "Export data button"
+  },
+  "changeLanguage": "Change Language",
+  "@changeLanguage": {
+    "description": "Change language button"
+  },
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard tab title"
+  },
+  "analytics": "Analytics",
+  "@analytics": {
+    "description": "Analytics tab title"
+  },
+  "reports": "Reports",
+  "@reports": {
+    "description": "Reports tab title"
+  },
+  "securityOverview": "Security Overview",
+  "@securityOverview": {
+    "description": "Security overview section title"
+  },
+  "threatLevel": "Threat Level",
+  "@threatLevel": {
+    "description": "Threat level indicator"
+  },
+  "activeThreats": "Active Threats",
+  "@activeThreats": {
+    "description": "Active threats count"
+  },
+  "securedDevices": "Secured Devices",
+  "@securedDevices": {
+    "description": "Secured devices count"
+  },
+  "lastScan": "Last Scan",
+  "@lastScan": {
+    "description": "Last scan timestamp"
+  },
+  "runScan": "Run Scan",
+  "@runScan": {
+    "description": "Run scan button"
+  },
+  "viewDetails": "View Details",
+  "@viewDetails": {
+    "description": "View details button"
+  },
+  "low": "Low",
+  "@low": {
+    "description": "Low threat level"
+  },
+  "medium": "Medium",
+  "@medium": {
+    "description": "Medium threat level"
+  },
+  "high": "High",
+  "@high": {
+    "description": "High threat level"
+  },
+  "critical": "Critical",
+  "@critical": {
+    "description": "Critical threat level"
+  },
+  "login": "Login",
+  "@login": {
+    "description": "Login button text"
+  },
+  "signup": "Sign Up",
+  "@signup": {
+    "description": "Sign up button text"
+  },
+  "email": "Email",
+  "@email": {
+    "description": "Email field label"
+  },
+  "password": "Password",
+  "@password": {
+    "description": "Password field label"
+  },
+  "confirmPassword": "Confirm Password",
+  "@confirmPassword": {
+    "description": "Confirm password field label"
+  },
+  "forgotPassword": "Forgot Password?",
+  "@forgotPassword": {
+    "description": "Forgot password link text"
+  },
+  "resetPassword": "Reset Password",
+  "@resetPassword": {
+    "description": "Reset password button text"
+  },
+  "sendResetLink": "Send Reset Link",
+  "@sendResetLink": {
+    "description": "Send reset link button text"
+  },
+  "backToLogin": "Back to Login",
+  "@backToLogin": {
+    "description": "Back to login link text"
+  },
+  "enterEmail": "Enter your email",
+  "@enterEmail": {
+    "description": "Enter email placeholder"
+  },
+  "enterPassword": "Enter your password",
+  "@enterPassword": {
+    "description": "Enter password placeholder"
+  },
+  "enterNewPassword": "Enter new password",
+  "@enterNewPassword": {
+    "description": "Enter new password placeholder"
+  },
+  "home": "Home",
+  "@home": {
+    "description": "Home tab label"
+  },
+  "profile": "Profile",
+  "@profile": {
+    "description": "Profile tab label"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "Settings tab label"
+  },
+  "security": "Security",
+  "@security": {
+    "description": "Security tab label"
+  },
+  "securityHub": "Security Hub",
+  "@securityHub": {
+    "description": "Security Hub page title"
+  },
+  "securityCenter": "Security Center",
+  "@securityCenter": {
+    "description": "Security Center page title"
+  },
+  "dashboard": "Dashboard",
+  "@dashboard": {
+    "description": "Dashboard page title"
+  },
+  "threatMonitoring": "Threat Monitoring",
+  "@threatMonitoring": {
+    "description": "Threat monitoring section title"
+  },
+  "userManagement": "User Management",
+  "@userManagement": {
+    "description": "User management section title"
+  },
+  "analytics": "Analytics",
+  "@analytics": {
+    "description": "Analytics section title"
+  },
+  "reports": "Reports",
+  "@reports": {
+    "description": "Reports section title"
+  },
+  "notifications": "Notifications",
+  "@notifications": {
+    "description": "Notifications section title"
+  },
+  "biometricAuth": "Biometric Authentication",
+  "@biometricAuth": {
+    "description": "Biometric authentication option"
+  },
+  "totpAuth": "TOTP Authentication",
+  "@totpAuth": {
+    "description": "TOTP authentication option"
+  },
+  "backupCodes": "Backup Codes",
+  "@backupCodes": {
+    "description": "Backup codes option"
+  },
+  "emailOtp": "Email OTP",
+  "@emailOtp": {
+    "description": "Email OTP option"
+  },
+  "changePassword": "Change Password",
+  "@changePassword": {
+    "description": "Change password option"
+  },
+  "activeSessions": "Active Sessions",
+  "@activeSessions": {
+    "description": "Active sessions option"
+  },
+  "securityAlerts": "Security Alerts",
+  "@securityAlerts": {
+    "description": "Security alerts option"
+  },
+  "accountRecovery": "Account Recovery",
+  "@accountRecovery": {
+    "description": "Account recovery option"
+  },
+  "personalInfo": "Personal Information",
+  "@personalInfo": {
+    "description": "Personal information section"
+  },
+  "appearance": "Appearance",
+  "@appearance": {
+    "description": "Appearance settings section"
+  },
+  "helpCenter": "Help Center",
+  "@helpCenter": {
+    "description": "Help center section"
+  },
+  "sendFeedback": "Send Feedback",
+  "@sendFeedback": {
+    "description": "Send feedback option"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Logout button text"
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button text"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Edit button text"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Add button text"
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Remove button text"
+  },
+  "enable": "Enable",
+  "@enable": {
+    "description": "Enable button text"
+  },
+  "disable": "Disable",
+  "@disable": {
+    "description": "Disable button text"
+  },
+  "loading": "Loading...",
+  "@loading": {
+    "description": "Loading indicator text"
+  },
+  "error": "Error",
+  "@error": {
+    "description": "Error message prefix"
+  },
+  "success": "Success",
+  "@success": {
+    "description": "Success message prefix"
+  },
+  "warning": "Warning",
+  "@warning": {
+    "description": "Warning message prefix"
+  },
+  "info": "Information",
+  "@info": {
+    "description": "Information message prefix"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "yes": "Yes",
+  "@yes": {
+    "description": "Yes button text"
+  },
+  "no": "No",
+  "@no": {
+    "description": "No button text"
+  },
+  "ok": "OK",
+  "@ok": {
+    "description": "OK button text"
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Close button text"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button text"
+  },
+  "previous": "Previous",
+  "@previous": {
+    "description": "Previous button text"
+  },
+  "skip": "Skip",
+  "@skip": {
+    "description": "Skip button text"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Done button text"
+  },
+  "continueAction": "Continue",
+  "@continueAction": {
+    "description": "Continue button text"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry button text"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button text"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search placeholder text"
+  },
+  "filter": "Filter",
+  "@filter": {
+    "description": "Filter button text"
+  },
+  "sort": "Sort",
+  "@sort": {
+    "description": "Sort button text"
+  },
+  "export": "Export",
+  "@export": {
+    "description": "Export button text"
+  },
+  "import": "Import",
+  "@import": {
+    "description": "Import button text"
+  },
+  "share": "Share",
+  "@share": {
+    "description": "Share button text"
+  },
+  "copy": "Copy",
+  "@copy": {
+    "description": "Copy button text"
+  },
+  "paste": "Paste",
+  "@paste": {
+    "description": "Paste button text"
+  },
+  "cut": "Cut",
+  "@cut": {
+    "description": "Cut button text"
+  },
+  "selectAll": "Select All",
+  "@selectAll": {
+    "description": "Select all button text"
+  },
+  "clear": "Clear",
+  "@clear": {
+    "description": "Clear button text"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Reset button text"
+  },
+  "update": "Update",
+  "@update": {
+    "description": "Update button text"
+  },
+  "upgrade": "Upgrade",
+  "@upgrade": {
+    "description": "Upgrade button text"
+  },
+  "download": "Download",
+  "@download": {
+    "description": "Download button text"
+  },
+  "upload": "Upload",
+  "@upload": {
+    "description": "Upload button text"
+  },
+  "sync": "Sync",
+  "@sync": {
+    "description": "Sync button text"
+  },
+  "backup": "Backup",
+  "@backup": {
+    "description": "Backup button text"
+  },
+  "restore": "Restore",
+  "@restore": {
+    "description": "Restore button text"
+  },
+  "createNewAccount": "Create New Account",
+  "signupSubtitle": "Join us today and protect your data",
+  "alreadyHaveAccount": "Already have an account? ",
+  "signupWithGoogle": "Sign up with Google",
+  "nameValidation": "Please enter your full name",
+  "emailValidation": "Please enter a valid email address",
+  "passwordValidation": "Password must be at least 8 characters long",
+  "emailAlreadyRegistered": "Email already registered. Please log in.",
+  "registrationFailed": "Failed to register user.",
+  "verificationEmailSent": "Verification code sent to your email",
+  "googleAccountNotRegistered": "Google account not registered. Please sign up first.",
+  "goToSignup": "Go to Sign up",
+  "accountNotFound": "Account not found",
+  "googleSignupFailed": "Google sign up failed",
+  "forgotPasswordTitle": "Forgot Password?",
+  "forgotPasswordSubtitle": "Enter your email and we'll send you a reset code",
+  "sendResetCode": "Send Reset Code",
+  "resetCodeSent": "Password reset code sent to your email.",
+  "failedToSendCode": "Failed to send code",
+  "verification": "Verification",
+  "enterCodeSentTo": "Enter the code sent to {email}",
+  "securityKey": "Security Key",
+  "ensureKeyMatches": "Ensure this key matches the one in your email to avoid phishing.",
+  "verify": "Verify",
+  "resending": "Resending...",
+  "resendIn": "Resend in {seconds}s",
+  "resendCode": "Resend code",
+  "invalidOrExpiredCode": "Invalid or expired code",
+  "otpResentTo": "OTP re-sent to {email}",
+  "failedToResend": "Failed to resend: {error}",
+  "enterSixDigitCode": "Enter the 6-digit code",
+  "environmentalCenter": "Environmental Center",
+  "sensors": "Sensors",
+  "tips": "Tips",
+  "dailyGreenGoal": "Daily Green Goal",
+  "scanWaste": "Scan Waste",
+  "logCommute": "Log Commute",
+  "energyTips": "Energy Tips",
+  "liveMetrics": "Live Metrics",
+  "airQualityIndex": "Air Quality Index",
+  "energyUsage": "Energy Usage",
+  "energyOverTime": "Energy Over Time",
+  "exportImage": "Export image",
+  "exportCsv": "Export CSV",
+  "csvExported": "CSV exported",
+  "chartImageExported": "Chart image exported",
+  "exportFailed": "Export failed",
+  "energySourceBreakdown": "Energy Source Breakdown",
+  "solar": "Solar",
+  "grid": "Grid",
+  "battery": "Battery",
+  "energy": "Energy",
+  "average": "Avg (MA)",
+  "goodThreshold": "Good threshold",
+  "zoomPan": "Zoom/Pan",
+  "reducePlastics": "Reduce single-use plastics",
+  "reducePlasticsBody": "Carry a reusable bottle and bag.",
+  "saveEnergyHome": "Save energy at home",
+  "saveEnergyHomeBody": "Switch to LED and unplug idle devices.",
+  "greenerCommute": "Greener commute",
+  "greenerCommuteBody": "Walk, cycle, or use public transport when possible.",
+  "biometricsNotAvailable": "Biometrics not available on this device.",
+  "biometricSigninEnabled": "Biometric sign-in enabled.",
+  "biometricEnrollmentCancelled": "Biometric enrollment cancelled.",
+  "biometricSigninDisabled": "Biometric sign-in disabled.",
+  "logoutConfirmation": "Are you sure you want to logout?",
+  "logoutFailed": "Failed to logout",
+  "failedToOpenPage": "Failed to open {pageName}",
+  "securityVerification": "Security Verification",
+  "securityHubSubtitle": "Manage your account security",
+  "securityScore": "Security Score: {score}%",
+  "accountStatus": "Account Status",
+  "accountStatusSubtitle": "Your account is secure",
+  "account": "Account",
+  "personalInformation": "Personal Information",
+  "personalInformationSubtitle": "Update your profile details",
+  "notificationsSubtitle": "Manage notification preferences",
+  "appearanceSubtitle": "Customize app appearance",
+  "helpCenterSubtitle": "Get help and support",
+  "sendFeedbackSubtitle": "Share your thoughts and feedback",
+  "vulnerabilityScanning": "Vulnerability Scanning",
+  "userBehaviorAnalytics": "User Behavior Analytics",
+  "auditTrail": "Audit Trail",
+  "securitySettings": "Security Settings",
+  "viewLogs": "View Logs",
+  "summaryEmails": "Summary Emails",
+  "roleManagement": "Role Management",
+  "sessionSettings": "Session Settings",
+  "databaseMigration": "Database Migration",
+  "realTimeMonitoring": "Real-time Monitoring",
+  "securityAnalytics": "Security Analytics",
+  "threatIntelligence": "Threat Intelligence",
+  "userRiskScoring": "User Risk Scoring",
+  "complianceReporting": "Compliance Reporting",
+  "securityIncidentResponse": "Security Incident Response",
+  "userActivity": "User Activity",
+  "advancedServices": "Advanced Services",
+  "quantumCrypto": "Quantum Crypto",
+  "complianceAutomation": "Compliance Automation",
+  "mdmDashboard": "MDM Dashboard",
+  "forensicsDashboard": "Forensics Dashboard",
+  "otpVerification": "OTP Verification",
+  "enterOtpCode": "Enter OTP Code",
+  "totpSetup": "TOTP Setup",
+  "totpVerification": "TOTP Verification",
+  "scanQrCode": "Scan QR Code",
+  "enterTotpCode": "Enter TOTP Code",
+  "backupCodeLogin": "Backup Code Login",
+  "enterBackupCode": "Enter Backup Code",
+  "phoneLogin": "Phone Login",
+  "enterPhoneNumber": "Enter Phone Number",
+  "sendOtp": "Send OTP",
+  "forgotPasswordTitle": "Forgot Password",
+  "resetPasswordTitle": "Reset Password",
+  "securitySetup": "Security Setup",
+  "setupSecurityMethods": "Setup Security Methods",
+  "authenticatorApp": "Authenticator App",
+  "passkeys": "Passkeys",
+  "securityAccountCenter": "Security Account Center",
+  "analyticsOverview": "Analytics Overview",
+  "usageDashboard": "Usage Dashboard",
+  "securityDashboard": "Security Dashboard",
+  "viewLogs": "View Logs",
+  "auditLogs": "Audit Logs",
+  "systemLogs": "System Logs",
+  "errorLogs": "Error Logs",
+  "accessLogs": "Access Logs",
+  "summaryEmails": "Summary Emails",
+  "emailSettings": "Email Settings",
+  "notificationSettings": "Notification Settings",
+  "advancedSettings": "Advanced Settings",
+  "systemSettings": "System Settings",
+  "privacySettings": "Privacy Settings",
+  "dataExport": "Data Export",
+  "dataImport": "Data Import",
+  "backupRestore": "Backup & Restore",
+  "maintenanceMode": "Maintenance Mode",
+  "systemStatus": "System Status",
+  "healthCheck": "Health Check",
+  "performanceMetrics": "Performance Metrics",
+  "resourceUsage": "Resource Usage",
+  "networkStatus": "Network Status",
+  "databaseStatus": "Database Status",
+  "serviceStatus": "Service Status",
+  "alertsNotifications": "Alerts & Notifications",
+  "criticalAlerts": "Critical Alerts",
+  "warningAlerts": "Warning Alerts",
+  "infoAlerts": "Info Alerts",
+  "alertHistory": "Alert History",
+  "notificationHistory": "Notification History",
+  "emailNotifications": "Email Notifications",
+  "pushNotifications": "Push Notifications",
+  "smsNotifications": "SMS Notifications",
+  "webhookNotifications": "Webhook Notifications",
+  "slackNotifications": "Slack Notifications"
+}

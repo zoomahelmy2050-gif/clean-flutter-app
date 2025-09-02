@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "951850160974",
+    "project_id": "hazem-a23a4",
+    "storage_bucket": "hazem-a23a4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951850160974:android:6da1d83f4ad9ae39a9841f",
+        "android_client_info": {
+          "package_name": "com.example.clean_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951850160974-d2260n5d2cpeplg3ud2mcqbekq52n8aa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.clean_flutter",
+            "certificate_hash": "e6faf57af9842973de85a0093f3a5212b0e3bc1d"
+          }
+        },
+        {
+          "client_id": "951850160974-frhtseulen7rp2hfceesr4onnop5t7mb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-J1fKPAE_X1hC9BUN3otDQZRMLBtVvTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951850160974-frhtseulen7rp2hfceesr4onnop5t7mb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:951850160974:android:f921bf6ab2ed8b46a9841f",
+        "android_client_info": {
+          "package_name": "com.hazem.cleanflutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "951850160974-frhtseulen7rp2hfceesr4onnop5t7mb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-J1fKPAE_X1hC9BUN3otDQZRMLBtVvTI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "951850160974-frhtseulen7rp2hfceesr4onnop5t7mb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

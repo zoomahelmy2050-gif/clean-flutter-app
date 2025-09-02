@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Intentionally left without default_web_client_id to rely solely on Android OAuth client config -->
+</resources>

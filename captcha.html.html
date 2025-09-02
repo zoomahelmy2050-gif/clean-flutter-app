@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+      html, body { height: 100%; }
+      body { margin:0; background:transparent; }
+      .wrap { display:flex; align-items:center; justify-content:center; height:100%; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="g-recaptcha"
+           data-sitekey="6LeBv6srAAAAAIly4XWHHyI6Mcy8fekBy-WQgX1H"
+           data-callback="onVerify"
+           data-error-callback="onError"></div>
+    </div>
+    <script>
+      function onVerify(token){
+        // The Flutter WebView listens for this custom scheme and intercepts it.
+        location.href = 'recaptcha://token/' + encodeURIComponent(token);
+      }
+      function onError(){
+        location.href = 'recaptcha://error/recaptcha_error';
+      }
+    </script>
+  </body>
+</html>
