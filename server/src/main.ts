@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module.js';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   try {
@@ -9,15 +9,21 @@ async function bootstrap() {
       PORT: process.env.PORT,
       NODE_ENV: process.env.NODE_ENV,
       DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
-      JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set'
+      JWT_SECRET: process.env.JWT_SECRET ? 'Set' : 'Not set',
     });
 
-    const app = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn'] });
-    app.enableCors();
-    
-    const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+    const app = await NestFactory.create(AppModule);
+  
+    // Enable CORS
+    app.enableCors({
+      origin: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
+      credentials: true,
+    });
+  
+    const port = process.env.PORT || 3000;
+  
     console.log(`Attempting to bind to port ${port}...`);
-    
+  
     await app.listen(port, '0.0.0.0');
     console.log(`E2EE server successfully listening on http://0.0.0.0:${port}`);
   } catch (error) {

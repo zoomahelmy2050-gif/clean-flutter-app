@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
-import 'features/auth/services/auth_service.dart';
+import 'core/config/app_config.dart';
+import 'core/services/api_service.dart';
 import 'features/auth/services/biometric_service.dart';
 import 'features/admin/services/threat_intelligence_service.dart';
 import 'features/admin/services/incident_response_service.dart' as admin_incident;
@@ -32,6 +33,15 @@ import 'core/services/privacy_dashboard_service.dart';
 import 'core/services/role_management_service.dart';
 import 'core/services/user_activity_service.dart';
 import 'core/services/security_settings_service.dart';
+import 'core/services/database_migration_service.dart';
+import 'core/services/backend_sync_service.dart';
+import 'core/services/migration_service.dart';
+import 'features/auth/services/auth_service.dart';
+import 'package:clean_flutter/core/services/api_service.dart';
+import 'core/services/notification_service.dart';
+import 'core/services/database_service.dart';
+import 'core/services/connectivity_service.dart';
+import 'core/services/backend_auth_service.dart';
 import 'core/services/realtime_notification_service.dart';
 import 'core/services/background_sync_service.dart';
 import 'core/services/webauthn_service.dart';
@@ -146,12 +156,17 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<BackendNotificationService>(() => BackendNotificationService());
   
   // Register Auth Services
-  locator.registerLazySingleton(() => AuthService());
+  locator.registerLazySingleton<AuthService>(() => AuthService());
   locator.registerLazySingleton(() => PendingActionsService());
   locator.registerLazySingleton<BiometricService>(() => BiometricService());
   locator.registerLazySingleton<PhoneAuthService>(() => PhoneAuthService());
   locator.registerLazySingleton<BackendService>(() => BackendService());
-  locator.registerLazySingleton<DatabaseService>(() => DatabaseService());
+  locator.registerSingleton<DatabaseService>(
+    DatabaseService(
+      baseUrl: AppConfig.backendUrl,
+      useMockMode: AppConfig.useLocalStorage,
+    ),
+  );
   locator.registerLazySingleton<HybridAuthService>(() => HybridAuthService());
   locator.registerLazySingleton<AdvancedLoginMonitor>(() => AdvancedLoginMonitor());
   locator.registerLazySingleton<EnhancedAuthService>(() => EnhancedAuthService());
@@ -357,6 +372,12 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<ProductionDatabaseService>(() => ProductionDatabaseService());
   locator.registerLazySingleton<ProductionCryptoService>(() => ProductionCryptoService.instance);
   locator.registerLazySingleton<DatabaseMigrationService>(() => DatabaseMigrationService.instance);
+  locator.registerLazySingleton<MigrationService>(() => MigrationService(
+    locator<DatabaseService>(),
+  ));
+  locator.registerLazySingleton<BackendSyncService>(() => BackendSyncService(
+    locator<DatabaseService>(),
+  ));
   locator.registerLazySingleton<prod_backend.ProductionBackendService>(() => prod_backend.ProductionBackendService());
   
   // Register EmailSettingsService

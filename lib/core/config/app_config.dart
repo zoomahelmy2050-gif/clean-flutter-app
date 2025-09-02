@@ -1,10 +1,11 @@
 class AppConfig {
   // Environment configuration
-  static const String _environment = 'production'; // Changed to production to use deployed backend
+  static const String _environment = 'production'; // Use Render backend
+  static String get environment => _environment;
   
   // Backend URLs for different environments
   static const Map<String, String> _backendUrls = {
-    'development': 'local', // Use local storage only during development
+    'development': 'http://localhost:3000', // Change to local for testing
     'staging': 'https://clean-flutter-app.onrender.com', // Render staging
     'production': 'https://clean-flutter-app.onrender.com', // Render production - Your deployed backend
   };

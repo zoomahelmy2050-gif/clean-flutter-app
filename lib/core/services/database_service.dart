@@ -5,9 +5,14 @@ import 'package:crypto/crypto.dart';
 import 'dart:developer' as developer;
 
 class DatabaseService {
-  static const String baseUrl = 'http://10.0.2.2:3000/api';
-  static const bool useMockMode = false; // Set to true for testing without server
+  final String baseUrl;
+  final bool useMockMode;
   String? _authToken;
+
+  DatabaseService({required this.baseUrl, required this.useMockMode});
+
+  // Getter for auth token
+  String? get authToken => _authToken;
 
   // Initialize and get auth token
   Future<void> initialize() async {
@@ -27,6 +32,42 @@ class DatabaseService {
     _authToken = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
+  }
+
+  // Close database
+  Future<void> close() async {
+    // await _database?.close();
+    // _database = null;
+  }
+
+  // Sync helper methods
+  Future<List<Map<String, dynamic>>> getAllDevices() async {
+    // Return mock data for now
+    return [];
+  }
+
+  Future<Map<String, dynamic>?> getDevice(String deviceId) async {
+    // Return mock data for now
+    return null;
+  }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedSecurityLogs() async {
+    // Return mock data for now
+    return [];
+  }
+
+  Future<List<Map<String, dynamic>>> getUnsyncedBlobs() async {
+    // Return mock data for now
+    return [];
+  }
+
+  Future<Map<String, dynamic>?> getBlob(String blobId) async {
+    // Return mock data for now
+    return null;
+  }
+
+  Future<void> markAsSynced(String table, String id) async {
+    // Mock implementation for now
   }
 
   // Get headers with auth token

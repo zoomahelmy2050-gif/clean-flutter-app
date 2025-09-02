@@ -38,8 +38,10 @@ import '../profile/security_alerts_page.dart';
 import '../profile/account_recovery_page.dart';
 import 'package:clean_flutter/features/admin/user_management_page.dart';
 import 'package:clean_flutter/features/admin/security_analytics_page.dart';
+import '../../core/services/migration_service.dart';
+import '../../core/services/backend_sync_service.dart';
 import 'package:clean_flutter/features/admin/real_time_monitoring_page.dart';
-import 'package:clean_flutter/features/admin/database_migration_page.dart';
+import 'screens/database_migration_screen.dart';
 import 'package:clean_flutter/features/admin/pages/quantum_crypto_dashboard.dart';
 import 'package:clean_flutter/features/admin/pages/advanced_services_dashboard.dart' as advanced;
 import 'package:clean_flutter/core/services/enhanced_rbac_service.dart';
@@ -678,11 +680,13 @@ class _SecurityCenterPageState extends State<SecurityCenterPage> {
               ),
               delegate: SliverChildListDelegate([
                 _ActionCard(
-                  icon: Icons.cloud_sync,
-                  title: 'Backend Sync',
-                  subtitle: 'Manage server integration',
+                  icon: Icons.storage,
+                  title: 'Database Migration',
+                  subtitle: 'Manage database sync & migrations',
                   onTap: () {
-                    Navigator.pushNamed(context, '/backend-sync');
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const DatabaseMigrationScreen()),
+                    );
                   },
                 ),
                 _buildEnhancedRBACCard(
@@ -1061,7 +1065,19 @@ class _SecurityCenterPageState extends State<SecurityCenterPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const DatabaseMigrationPage()),
+                              MaterialPageRoute(
+                                builder: (context) => MultiProvider(
+                                  providers: [
+                                    ChangeNotifierProvider(
+                                      create: (_) => locator<MigrationService>(),
+                                    ),
+                                    ChangeNotifierProvider(
+                                      create: (_) => locator<BackendSyncService>(),
+                                    ),
+                                  ],
+                                  child: const DatabaseMigrationScreen(),
+                                ),
+                              ),
                             );
                           },
                           icon: const Icon(Icons.settings),
