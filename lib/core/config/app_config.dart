@@ -1,12 +1,12 @@
 class AppConfig {
-  // Environment configuration - Force development for now
-  static const String _environment = 'development'; // Fixed to development during app development
+  // Environment configuration
+  static const String _environment = 'production'; // Changed to production to use deployed backend
   
   // Backend URLs for different environments
   static const Map<String, String> _backendUrls = {
     'development': 'local', // Use local storage only during development
-    'staging': 'https://your-staging-service.onrender.com', // Render staging
-    'production': 'https://your-production-service.onrender.com', // Render production
+    'staging': 'https://clean-flutter-app.onrender.com', // Render staging
+    'production': 'https://clean-flutter-app.onrender.com', // Render production - Your deployed backend
   };
   
   // Get current backend URL based on environment
