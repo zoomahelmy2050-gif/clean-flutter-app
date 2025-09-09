@@ -1,8 +1,14 @@
 import 'package:flutter/foundation.dart';
-import 'dart:async';
 import 'dart:math';
+import 'dart:async';
+import 'ai_assistant_service.dart';
+import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'enhanced_ai_models.dart';
+import 'ai_settings_service.dart';
 
+// Models moved to enhanced_ai_models.dart
 class ThreatAnalysis {
   final String id;
   final DateTime timestamp;
@@ -70,6 +76,21 @@ class AutoHuntResult {
 }
 
 class AISecurityCopilotService extends ChangeNotifier {
+  // Enhanced AI capabilities
+  final List<DeepReasoningAnalysis> _deepAnalyses = [];
+  final List<SuspiciousActivity> _suspiciousActivities = [];
+  final List<PolicySuggestion> _policySuggestions = [];
+  final List<AutomatedAction> _pendingActions = [];
+  final List<AutomatedAction> _executedActions = [];
+  final List<LearningPattern> _learningPatterns = [];
+  final Map<String, dynamic> _knowledgeBase = {};
+  
+  AISettings _settings = AISettings();
+  bool _deepReasoningActive = false;
+  Timer? _suspiciousActivityTimer;
+  Timer? _autoActionTimer;
+  
+  // Existing properties
   final List<ThreatAnalysis> _analyses = [];
   final List<PredictiveThreat> _predictions = [];
   final List<AutoHuntResult> _huntResults = [];
@@ -80,10 +101,29 @@ class AISecurityCopilotService extends ChangeNotifier {
   Timer? _autoHuntTimer;
   Timer? _predictionTimer;
   
+  // Getters for enhanced features
+  List<DeepReasoningAnalysis> get deepAnalyses => _deepAnalyses;
+  List<SuspiciousActivity> get suspiciousActivities => _suspiciousActivities;
+  List<PolicySuggestion> get policySuggestions => _policySuggestions;
+  List<AutomatedAction> get pendingActions => _pendingActions;
+  List<AutomatedAction> get executedActions => _executedActions;
+  AISettings get settings => _settings;
+  bool get deepReasoningActive => _deepReasoningActive;
+  
+  // Existing getters
   List<ThreatAnalysis> get analyses => _analyses;
   List<PredictiveThreat> get predictions => _predictions;
   List<AutoHuntResult> get huntResults => _huntResults;
   bool get isAnalyzing => _isAnalyzing;
+
+  // Chat functionality
+  final List<AIChatMessage> _messages = [];
+  bool _isTyping = false;
+  String _currentModel = 'GPT-4';
+  
+  List<AIChatMessage> get messages => _messages;
+  bool get isTyping => _isTyping;
+  String get currentModel => _currentModel;
 
   AISecurityCopilotService() {
     _initializeService();
@@ -93,6 +133,387 @@ class AISecurityCopilotService extends ChangeNotifier {
     _startAutomatedThreatHunting();
     _startPredictiveModeling();
     _loadHistoricalData();
+    _initializeEnhancedFeatures();
+  }
+  
+  Future<void> _initializeEnhancedFeatures() async {
+    _settings = await AISettings.load();
+    if (_settings.suspiciousActivityDetectionEnabled) {
+      _startSuspiciousActivityDetection();
+    }
+    _startAutoActionProcessor();
+    notifyListeners();
+  }
+  
+  // Enhanced Feature: Suspicious Activity Detection
+  void _startSuspiciousActivityDetection() {
+    _suspiciousActivityTimer?.cancel();
+    _suspiciousActivityTimer = Timer.periodic(
+      const Duration(seconds: 30),
+      (timer) => _detectSuspiciousActivities(),
+    );
+  }
+  
+  Future<void> _detectSuspiciousActivities() async {
+    if (!_settings.suspiciousActivityDetectionEnabled) return;
+    
+    await Future.delayed(const Duration(seconds: 1));
+    
+    final activities = [
+      'Multiple failed login attempts detected',
+      'Unusual data access pattern identified',
+      'Privilege escalation attempt detected',
+      'Abnormal network traffic pattern',
+      'Unauthorized API access attempt',
+    ];
+    
+    if (_random.nextDouble() > 0.6) {
+      final activity = SuspiciousActivity(
+        id: 'SA-${DateTime.now().millisecondsSinceEpoch}',
+        detectedAt: DateTime.now(),
+        type: ['Authentication', 'Data Access', 'Network', 'API'][_random.nextInt(4)],
+        description: activities[_random.nextInt(activities.length)],
+        anomalyScore: 0.65 + _random.nextDouble() * 0.35,
+        indicators: {
+          'ip_addresses': ['192.168.1.${_random.nextInt(255)}'],
+          'user_accounts': ['user${_random.nextInt(1000)}'],
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+        affectedAssets: ['Server-${_random.nextInt(10)}', 'Database-${_random.nextInt(5)}'],
+        severity: _random.nextDouble() > 0.5 ? 'High' : 'Medium',
+        context: {
+          'location': 'Data Center ${_random.nextInt(3) + 1}',
+          'protocol': ['HTTP', 'HTTPS', 'SSH', 'FTP'][_random.nextInt(4)],
+        },
+        recommendedActions: _generateRecommendedActions(),
+      );
+      
+      _suspiciousActivities.insert(0, activity);
+      if (_suspiciousActivities.length > 20) {
+        _suspiciousActivities.removeLast();
+      }
+      
+      // Queue automated actions if enabled
+      if (_settings.autoActionsEnabled) {
+        _pendingActions.addAll(activity.recommendedActions);
+      }
+      
+      notifyListeners();
+    }
+  }
+  
+  List<AutomatedAction> _generateRecommendedActions() {
+    final actions = <AutomatedAction>[];
+    
+    if (_random.nextDouble() > 0.5) {
+      actions.add(AutomatedAction(
+        id: 'ACT-${DateTime.now().millisecondsSinceEpoch}',
+        type: 'block_ip',
+        description: 'Block suspicious IP address',
+        parameters: {'ip': '192.168.1.${_random.nextInt(255)}'},
+        riskLevel: 'medium',
+        requiresConfirmation: true,
+      ));
+    }
+    
+    if (_random.nextDouble() > 0.6) {
+      actions.add(AutomatedAction(
+        id: 'ACT-${DateTime.now().millisecondsSinceEpoch + 1}',
+        type: 'enable_monitoring',
+        description: 'Enable enhanced monitoring for affected systems',
+        parameters: {'duration': '24h', 'level': 'high'},
+        riskLevel: 'low',
+        requiresConfirmation: false,
+      ));
+    }
+    
+    return actions;
+  }
+  
+  // Enhanced Feature: Auto Action Processor
+  void _startAutoActionProcessor() {
+    _autoActionTimer?.cancel();
+    _autoActionTimer = Timer.periodic(
+      Duration(seconds: _settings.autoActionDelaySeconds),
+      (timer) => _processAutoActions(),
+    );
+  }
+  
+  Future<void> _processAutoActions() async {
+    if (!_settings.autoActionsEnabled || _pendingActions.isEmpty) return;
+    
+    final actionsToProcess = List<AutomatedAction>.from(_pendingActions);
+    for (final action in actionsToProcess) {
+      if (_shouldExecuteAction(action)) {
+        if (action.requiresConfirmation) {
+          // In a real app, this would trigger a UI confirmation dialog
+          // For now, we'll simulate confirmation
+          await _simulateActionConfirmation(action);
+        } else {
+          await _executeAction(action);
+        }
+      }
+    }
+  }
+  
+  bool _shouldExecuteAction(AutomatedAction action) {
+    final actionTypeEnabled = _settings.actionTypeSettings[action.type] ?? false;
+    final meetsThreshold = action.riskLevel == 'low' || 
+                           action.riskLevel == 'medium' && _random.nextDouble() > 0.3;
+    return actionTypeEnabled && meetsThreshold;
+  }
+  
+  Future<void> _simulateActionConfirmation(AutomatedAction action) async {
+    // Simulate user confirmation delay
+    await Future.delayed(const Duration(seconds: 2));
+    
+    // Simulate 80% approval rate
+    if (_random.nextDouble() < 0.8) {
+      await _executeAction(action);
+    } else {
+      _pendingActions.remove(action);
+      notifyListeners();
+    }
+  }
+  
+  Future<void> _executeAction(AutomatedAction action) async {
+    _pendingActions.remove(action);
+    _executedActions.insert(0, action);
+    
+    if (_executedActions.length > 50) {
+      _executedActions.removeLast();
+    }
+    
+    // Apply learning from action execution
+    if (_settings.selfLearningEnabled) {
+      _applyLearning(action);
+    }
+    
+    notifyListeners();
+  }
+  
+  // Enhanced Feature: Deep Reasoning
+  Future<DeepReasoningAnalysis> performDeepReasoning(String query) async {
+    if (!_settings.deepReasoningEnabled) {
+      throw Exception('Deep reasoning is disabled');
+    }
+    
+    _deepReasoningActive = true;
+    notifyListeners();
+    
+    await Future.delayed(const Duration(seconds: 2));
+    
+    final analysis = DeepReasoningAnalysis(
+      id: 'DR-${DateTime.now().millisecondsSinceEpoch}',
+      timestamp: DateTime.now(),
+      query: query,
+      analysis: _generateDeepAnalysis(query),
+      confidenceScore: 0.7 + _random.nextDouble() * 0.3,
+      recommendations: _generateDeepRecommendations(query),
+      reasoningChain: _generateReasoningChain(query),
+      contextualFactors: _analyzeContextualFactors(query),
+      policySuggestions: _generatePolicySuggestions(query),
+      suggestedActions: _generateSuggestedActions(query),
+      riskLevel: _assessRiskLevel(query),
+      learningOutcome: _extractLearningOutcome(query),
+    );
+    
+    _deepAnalyses.insert(0, analysis);
+    if (_deepAnalyses.length > 10) {
+      _deepAnalyses.removeLast();
+    }
+    
+    if (_settings.selfLearningEnabled) {
+      _updateKnowledgeBase(analysis);
+    }
+    
+    _deepReasoningActive = false;
+    notifyListeners();
+    
+    return analysis;
+  }
+  
+  String _generateDeepAnalysis(String query) {
+    final analyses = [
+      'Based on multi-layered threat intelligence analysis, the query indicates potential security implications requiring immediate attention.',
+      'Cross-referencing with historical patterns reveals a correlation with previous incidents, suggesting preventive measures.',
+      'The contextual analysis shows elevated risk factors that warrant enhanced monitoring and proactive defense strategies.',
+    ];
+    return analyses[_random.nextInt(analyses.length)];
+  }
+  
+  List<String> _generateDeepRecommendations(String query) {
+    return [
+      'Implement zero-trust architecture for affected systems',
+      'Deploy advanced threat detection algorithms',
+      'Establish continuous security monitoring',
+      'Update security policies based on threat landscape',
+    ].take(2 + _random.nextInt(2)).toList();
+  }
+  
+  Map<String, dynamic> _generateReasoningChain(String query) {
+    return {
+      'initial_assessment': 'Query analyzed for threat indicators',
+      'pattern_matching': 'Matched against known attack patterns',
+      'risk_evaluation': 'Risk score calculated: ${(0.5 + _random.nextDouble() * 0.5).toStringAsFixed(2)}',
+      'mitigation_strategy': 'Optimal defense strategy identified',
+      'confidence': '${(80 + _random.nextInt(20))}%',
+    };
+  }
+  
+  Map<String, dynamic> _analyzeContextualFactors(String query) {
+    return {
+      'time_of_day': DateTime.now().hour < 8 || DateTime.now().hour > 18 ? 'Off-hours' : 'Business hours',
+      'system_load': '${40 + _random.nextInt(60)}%',
+      'active_threats': _random.nextInt(5),
+      'compliance_status': 'Compliant',
+    };
+  }
+  
+  List<PolicySuggestion> _generatePolicySuggestions(String query) {
+    if (!_settings.policyRecommendationsEnabled) return [];
+    
+    final suggestions = <PolicySuggestion>[];
+    
+    suggestions.add(PolicySuggestion(
+      id: 'POL-${DateTime.now().millisecondsSinceEpoch}',
+      title: 'Enhanced Authentication Policy',
+      description: 'Implement stricter authentication requirements for sensitive operations',
+      category: 'Access Control',
+      impact: 'High',
+      implementation: {
+        'complexity': 'Medium',
+        'timeline': '2 weeks',
+        'resources': 'Security team',
+      },
+      priority: 0.8 + _random.nextDouble() * 0.2,
+    ));
+    
+    if (_random.nextDouble() > 0.5) {
+      suggestions.add(PolicySuggestion(
+        id: 'POL-${DateTime.now().millisecondsSinceEpoch + 1}',
+        title: 'Data Encryption Standards',
+        description: 'Upgrade encryption protocols for data at rest and in transit',
+        category: 'Data Protection',
+        impact: 'Critical',
+        implementation: {
+          'complexity': 'High',
+          'timeline': '1 month',
+          'resources': 'Infrastructure team',
+        },
+        priority: 0.9,
+      ));
+    }
+    
+    _policySuggestions.insertAll(0, suggestions);
+    if (_policySuggestions.length > 20) {
+      _policySuggestions.removeRange(20, _policySuggestions.length);
+    }
+    
+    return suggestions;
+  }
+  
+  List<AutomatedAction> _generateSuggestedActions(String query) {
+    if (!_settings.requestedActionsEnabled) return [];
+    
+    return _generateRecommendedActions();
+  }
+  
+  String _assessRiskLevel(String query) {
+    final risk = _random.nextDouble();
+    if (risk > 0.7) return 'Critical';
+    if (risk > 0.4) return 'High';
+    if (risk > 0.2) return 'Medium';
+    return 'Low';
+  }
+  
+  Map<String, dynamic> _extractLearningOutcome(String query) {
+    return {
+      'pattern_identified': true,
+      'confidence_adjustment': 0.05,
+      'knowledge_gained': 'New threat pattern recognized',
+      'model_update': 'Weights adjusted for improved detection',
+    };
+  }
+  
+  // Enhanced Feature: Self-Learning
+  void _applyLearning(AutomatedAction action) {
+    final pattern = LearningPattern(
+      patternId: 'LP-${DateTime.now().millisecondsSinceEpoch}',
+      category: action.type,
+      features: action.parameters,
+      confidence: 0.7,
+      occurrences: 1,
+      firstSeen: DateTime.now(),
+      lastSeen: DateTime.now(),
+      associatedActions: [action.id],
+      outcomes: {'success': true, 'impact': 'positive'},
+    );
+    
+    _updateLearningPattern(pattern);
+  }
+  
+  void _updateLearningPattern(LearningPattern newPattern) {
+    final existingIndex = _learningPatterns.indexWhere(
+      (p) => p.category == newPattern.category && 
+             _areFeaturesimilar(p.features, newPattern.features),
+    );
+    
+    if (existingIndex != -1) {
+      final existing = _learningPatterns[existingIndex];
+      existing.occurrences++;
+      existing.lastSeen = DateTime.now();
+      existing.confidence = (existing.confidence + newPattern.confidence) / 2;
+      existing.associatedActions.addAll(newPattern.associatedActions);
+    } else {
+      _learningPatterns.add(newPattern);
+    }
+    
+    _saveLearningPatterns();
+  }
+  
+  bool _areFeaturesimilar(Map<String, dynamic> f1, Map<String, dynamic> f2) {
+    if (f1.keys.length != f2.keys.length) return false;
+    for (final key in f1.keys) {
+      if (!f2.containsKey(key) || f1[key] != f2[key]) return false;
+    }
+    return true;
+  }
+  
+  void _updateKnowledgeBase(DeepReasoningAnalysis analysis) {
+    _knowledgeBase['last_analysis'] = analysis.toJson();
+    _knowledgeBase['total_analyses'] = (_knowledgeBase['total_analyses'] ?? 0) + 1;
+    _knowledgeBase['average_confidence'] = 
+      ((_knowledgeBase['average_confidence'] ?? 0.0) * 
+       (_knowledgeBase['total_analyses'] - 1) + analysis.confidenceScore) / 
+       _knowledgeBase['total_analyses'];
+    
+    _saveKnowledgeBase();
+  }
+  
+  Future<void> _saveLearningPatterns() async {
+    final prefs = await SharedPreferences.getInstance();
+    final patterns = _learningPatterns.map((p) => p.toJson()).toList();
+    await prefs.setString('learning_patterns', json.encode(patterns));
+  }
+  
+  Future<void> _saveKnowledgeBase() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('knowledge_base', json.encode(_knowledgeBase));
+  }
+  
+  Future<void> updateSettings(AISettings newSettings) async {
+    _settings = newSettings;
+    await _settings.save();
+    
+    // Restart services based on new settings
+    if (_settings.suspiciousActivityDetectionEnabled) {
+      _startSuspiciousActivityDetection();
+    } else {
+      _suspiciousActivityTimer?.cancel();
+    }
+    
+    notifyListeners();
   }
 
   Future<void> _loadHistoricalData() async {
@@ -548,6 +969,8 @@ class AISecurityCopilotService extends ChangeNotifier {
   void dispose() {
     _autoHuntTimer?.cancel();
     _predictionTimer?.cancel();
+    _suspiciousActivityTimer?.cancel();
+    _autoActionTimer?.cancel();
     super.dispose();
   }
 }

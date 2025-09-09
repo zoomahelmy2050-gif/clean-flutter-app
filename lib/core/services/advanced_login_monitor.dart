@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
+import 'package:clean_flutter/locator.dart';
+import 'package:clean_flutter/features/admin/services/dynamic_workflow_service.dart';
 
 /// Advanced login attempt with comprehensive tracking
 class LoginAttempt {
@@ -74,6 +76,38 @@ class LoginAttempt {
           : null,
       securityFlags: List<String>.from(json['securityFlags'] ?? []),
     );
+  }
+
+  // Provide map-like accessor for tests that expect bracket syntax
+  dynamic operator [](String key) {
+    switch (key) {
+      case 'email':
+        return email;
+      case 'timestamp':
+        return timestamp.toIso8601String();
+      case 'successful':
+        return successful;
+      case 'ipAddress':
+        return ipAddress;
+      case 'userAgent':
+        return userAgent;
+      case 'deviceId':
+        return deviceId;
+      case 'location':
+        return location;
+      case 'riskScore':
+        return riskScore;
+      case 'metadata':
+        return metadata;
+      case 'attemptId':
+        return attemptId;
+      case 'responseTime':
+        return responseTime?.inMilliseconds;
+      case 'securityFlags':
+        return securityFlags;
+      default:
+        return null;
+    }
   }
 }
 
@@ -212,12 +246,12 @@ class AdvancedLoginMonitor extends ChangeNotifier {
   final Map<String, DateTime> _temporaryBlocks = {};
   
   // Configuration - More user-friendly settings
-  static const int _maxAttempts = 10;  // Allow more attempts before lockout
-  static const Duration _initialLockoutDuration = Duration(minutes: 5);  // Start with 5 min
-  static const Duration _attemptWindow = Duration(minutes: 30);  // Longer window
-  static const int _maxAttemptsInWindow = 15;  // More attempts allowed
-  static const double _highRiskThreshold = 0.85;  // Less aggressive risk scoring
-  static const double _mediumRiskThreshold = 0.5;
+  static const int _maxAttempts = 5; // Lockout after 5 failed attempts
+  static const Duration _initialLockoutDuration = Duration(minutes: 5); // Start with 5 min
+  static const Duration _attemptWindow = Duration(minutes: 10); // Shorter window
+  static const int _maxAttemptsInWindow = 7; // Fewer attempts allowed in window
+  static const double _highRiskThreshold = 0.7; // More aggressive risk scoring
+  static const double _mediumRiskThreshold = 0.4;
   
   // AI/ML simulation parameters
   final Random _random = Random();
@@ -321,12 +355,11 @@ class AdvancedLoginMonitor extends ChangeNotifier {
     double riskScore = 0.0;
     final normalizedEmail = email.toLowerCase();
     
-    // Factor 1: Failed attempts (reduced weight)
+    // Factor 1: Failed attempts (increased weight)
     final recentAttempts = _getRecentAttemptsForEmail(normalizedEmail, _attemptWindow);
     final failedCount = recentAttempts.where((a) => !a.successful).length;
     if (failedCount > 0) {
-      // More gradual increase
-      riskScore += (failedCount / (_maxAttempts * 2)) * 0.2;  // 20% weight, gentler curve
+      riskScore += (failedCount / _maxAttempts) * 0.3; // 30% weight, steeper curve
     }
     
     // Check if whitelisted (admin)
@@ -336,7 +369,7 @@ class AdvancedLoginMonitor extends ChangeNotifier {
     
     // Check if IP is blacklisted
     if (ipAddress != null && _blacklistedIPs.contains(ipAddress)) {
-      riskScore += 0.8;
+      riskScore += 0.5; // Slightly reduced impact, but still significant
     }
     
     // New user penalty
@@ -345,27 +378,27 @@ class AdvancedLoginMonitor extends ChangeNotifier {
       riskScore += 0.3;
     } else {
       // Check device trust
-      if (deviceId != null && !profile.trustedDevices.contains(deviceId)) {
-        riskScore += 0.2;
+      if (deviceId != null && !profile.trustedDevices.contains(deviceId)) { // Unknown device
+        riskScore += 0.25;
         
         // Device never seen before
         if (!profile.deviceLastSeen.containsKey(deviceId)) {
-          riskScore += 0.1;
+          riskScore += 0.2; // Higher penalty for completely new device
         }
       }
       
       // Check location trust
-      if (location != null && !profile.trustedLocations.contains(location)) {
-        riskScore += 0.15;
+      if (location != null && !profile.trustedLocations.contains(location)) { // Unknown location
+        riskScore += 0.2;
       }
       
       // Time-based analysis
       final now = DateTime.now();
       final hourOfDay = now.hour;
       
-      // Unusual time (midnight to 5 AM)
-      if (hourOfDay >= 0 && hourOfDay < 5) {
-        riskScore += 0.1;
+      // Unusual time (midnight to 4 AM, 10 PM to midnight)
+      if ((hourOfDay >= 0 && hourOfDay < 4) || (hourOfDay >= 22 && hourOfDay < 24)) {
+        riskScore += 0.15;
       }
       
       // Factor 2: Velocity of attempts (less aggressive)
@@ -375,11 +408,16 @@ class AdvancedLoginMonitor extends ChangeNotifier {
           timeDiffs.add(recentAttempts[i].timestamp.difference(recentAttempts[i-1].timestamp));
         }
         final avgDiff = timeDiffs.reduce((a, b) => a + b) ~/ timeDiffs.length;
-        if (avgDiff.inSeconds < 5) {  // Only flag very fast attempts
-          riskScore += 0.2;  // Likely automated
-        } else if (avgDiff.inSeconds < 15) {
-          riskScore += 0.1;  // Fast typing
+        if (avgDiff.inSeconds < 3) {  // Very fast attempts
+          riskScore += 0.3; // Higher penalty for extremely fast attempts
+        } else if (avgDiff.inSeconds < 10) {
+          riskScore += 0.15; // Still fast, moderate penalty
         }
+      }
+
+      // User agent analysis
+      if (userAgent != null && userAgent.toLowerCase().contains('bot')) {
+        riskScore += 0.4; // Significant penalty for bot-like user agents
       }
       
       // Behavioral anomaly detection (simulated)
@@ -453,12 +491,15 @@ class AdvancedLoginMonitor extends ChangeNotifier {
         _temporaryBlocks.remove(normalizedEmail);
       }
     }
+    // If expired, let it proceed naturally below
+    // _temporaryBlocks.remove(normalizedEmail); // Handled by cleanup
     
     // Check IP blacklist
     if (ipAddress != null && _blacklistedIPs.contains(ipAddress)) {
       return LoginPermission(
         allowed: false,
-        reason: 'Access denied from this location (IP blacklisted)',
+        reason: 'Access denied from this IP address (blacklisted)',
+        riskLevel: 'critical', // Assume critical risk for blacklisted IPs
       );
     }
     
@@ -471,51 +512,39 @@ class AdvancedLoginMonitor extends ChangeNotifier {
       location: location,
     );
     
-    // Determine risk level
-    String riskLevel;
-    if (riskScore >= _highRiskThreshold) {
-      riskLevel = 'high';
-    } else if (riskScore >= _mediumRiskThreshold) {
-      riskLevel = 'medium';
-    } else {
-      riskLevel = 'low';
-    }
+    // Determine risk level based on updated thresholds
+    final String riskLevel = _getRiskLevelString(riskScore);
     
     // Check recent attempts
     final recentAttempts = _getRecentAttemptsForEmail(normalizedEmail, _attemptWindow);
     final failedAttempts = recentAttempts.where((a) => !a.successful).toList();
     final attemptsRemaining = max(0, _maxAttempts - failedAttempts.length);
     
-    // Progressive security measures - Very user-friendly
+    // Apply progressive security measures based on failed attempts
     bool requiresMFA = false;
     bool requiresCaptcha = false;
     int delaySeconds = 0;
     
-    // Only block for extremely high risk (0.95+)
-    if (riskScore >= 0.95) {
-      // Block only extreme high-risk attempts
-      return LoginPermission(
-        allowed: false,
-        reason: 'Unusual activity detected. Please try again in a few minutes.',
-        riskScore: riskScore,
-        riskLevel: riskLevel,
-      );
-    } else if (riskScore >= 0.8) {
-      // Very high risk
-      requiresMFA = true;
+    if (failedAttempts.length >= 4) {
       requiresCaptcha = true;
-      delaySeconds = 2;  // Very short delay
-    } else if (failedAttempts.length >= 7) {
-      // After 7 failed attempts, require CAPTCHA
-      requiresCaptcha = true;
-      delaySeconds = 1;  // Minimal delay
-    } else if (failedAttempts.length >= 5) {
-      // Gentle reminder after 5 attempts
-      delaySeconds = 1;
+      delaySeconds = 3; // Delay for CAPTCHA challenge
+    } else if (failedAttempts.length >= 3) {
+      delaySeconds = 2; // Increased delay
+    } else if (failedAttempts.length >= 1) {
+      delaySeconds = 1; // Initial small delay
+    }
+
+    // Further escalate for higher risk scores
+    if (riskScore >= _highRiskThreshold) {
+      requiresMFA = true; // Always require MFA for high risk
+      delaySeconds = max(delaySeconds, 5); // Ensure at least 5s delay
+    } else if (riskScore >= _mediumRiskThreshold) {
+      requiresCaptcha = max(requiresCaptcha ? 1 : 0, 1) == 1; // Ensure CAPTCHA
+      delaySeconds = max(delaySeconds, 3); // Ensure at least 3s delay
     }
     
     // Check if max attempts exceeded with escalating lockouts
-    if (failedAttempts.length >= _maxAttempts) {
+    if (failedAttempts.length >= _maxAttempts) { // Now set to 5
       // Calculate escalating lockout duration based on previous lockouts
       final previousLockouts = _getRecentLockoutsForEmail(normalizedEmail);
       final lockoutMultiplier = min(previousLockouts + 1, 6);  // Cap at 6x
@@ -534,7 +563,7 @@ class AdvancedLoginMonitor extends ChangeNotifier {
         userAgent: userAgent,
         location: location,
         riskScore: riskScore,
-        metadata: {'lockout': true},
+        metadata: {'lockout': true, 'lockoutDuration': lockoutDuration.inMinutes},
       ));
       
       return LoginPermission(
@@ -639,7 +668,7 @@ class AdvancedLoginMonitor extends ChangeNotifier {
       securityFlags.add('BLACKLISTED_IP');
     }
     if (!successful && _getRecentAttemptsForEmail(normalizedEmail, const Duration(minutes: 1)).length > 2) {
-      securityFlags.add('RAPID_ATTEMPTS');
+      securityFlags.add('RAPID_FAILED_ATTEMPTS');
     }
     
     // Create attempt record
@@ -659,6 +688,41 @@ class AdvancedLoginMonitor extends ChangeNotifier {
     
     // Add to attempts list
     _attempts.insert(0, attempt);
+    
+    // Trigger dynamic workflow on high risk or blacklist/rapid failures
+    try {
+      if (securityFlags.contains('HIGH_RISK') || securityFlags.contains('BLACKLISTED_IP') || securityFlags.contains('RAPID_FAILED_ATTEMPTS')) {
+        final svc = locator<DynamicWorkflowService>();
+        final wf = svc.list().firstWhere(
+          (w) => w.triggers['type'] == 'security_incident',
+          orElse: () => DynamicWorkflow(
+            id: 'auto_security_response',
+            name: 'Auto Security Response',
+            description: 'Auto-run on high-risk login incidents',
+            steps: [
+              DynamicWorkflowStep(id: 'isolate', name: 'Isolate Threat', action: 'security.isolate_threat', onSuccess: 'analyze', onFailure: 'alert'),
+              DynamicWorkflowStep(id: 'analyze', name: 'Analyze Threat', action: 'security.deep_analysis', onSuccess: 'mitigate', onFailure: 'alert'),
+              DynamicWorkflowStep(id: 'mitigate', name: 'Apply Mitigation', action: 'security.apply_mitigation', onSuccess: 'report', onFailure: 'alert'),
+              DynamicWorkflowStep(id: 'report', name: 'Generate Report', action: 'reporting.incident_report', onSuccess: null, onFailure: 'alert'),
+              DynamicWorkflowStep(id: 'alert', name: 'Alert Administrators', action: 'notification.alert_admins', onSuccess: null, onFailure: null, parameters: {'priority': 'high'}),
+            ],
+            triggers: {'type': 'security_incident'},
+          ),
+        );
+        // Ensure persisted if this is the default created on the fly
+        if (svc.getById(wf.id) == null) {
+          await svc.create(wf);
+        }
+        await svc.execute(wf.id, context: {
+          'email': normalizedEmail,
+          'ipAddress': ipAddress,
+          'riskScore': riskScore,
+          'flags': securityFlags,
+        });
+      }
+    } catch (e) {
+      developer.log('Dynamic workflow trigger failed: $e', name: 'LoginMonitor');
+    }
     
     // Update user profile
     await _updateUserProfile(
@@ -894,9 +958,9 @@ class AdvancedLoginMonitor extends ChangeNotifier {
     return _attempts
         .where((a) => a.email == normalizedEmail && 
                      !a.successful && 
-                     a.timestamp.isAfter(cutoff))
-        .where((a) => a.metadata?['lockout'] == true)
-        .length ~/ _maxAttempts;  // Number of lockout periods
+                     a.timestamp.isAfter(cutoff) &&
+                     (a.metadata?['lockout'] == true || a.metadata?['lockoutDuration'] != null))
+        .length; // Count each lockout event, not just successful lockouts
   }
 
   /// Get security recommendation
@@ -923,5 +987,21 @@ class AdvancedLoginMonitor extends ChangeNotifier {
     }
     
     return 'Normal user - standard security';
+  }
+
+  // Helper to determine risk level string
+  String _getRiskLevelString(double score) {
+    if (score >= _highRiskThreshold) return 'high';
+    if (score >= _mediumRiskThreshold) return 'medium';
+    return 'low';
+  }
+
+  /// Expose for testing and external services
+  Set<String> get blacklistedIPs => Set.from(_blacklistedIPs);
+
+  @override
+  void dispose() {
+    // _cleanupTimer?.cancel(); // No timer in this class, so no need to cancel
+    super.dispose();
   }
 }

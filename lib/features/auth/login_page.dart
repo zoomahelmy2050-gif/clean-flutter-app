@@ -662,6 +662,36 @@ class _LoginPageState extends State<LoginPage>
       );
       final enhancedAuth = locator<EnhancedAuthService>();
       final authService = locator<AuthService>();
+      
+      // FORCE RELOAD to get latest blocked users from storage
+      await authService.reloadBlockedUsers();
+      
+      // Check if user is blocked FIRST
+      print('🔍 Login: Checking if $email is blocked...');
+      if (authService.isUserBlocked(email)) {
+        print('🚫 Login: User $email IS BLOCKED - denying access');
+        if (!mounted) return;
+        setState(() => _loading = false);
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Account Blocked'),
+            content: Text(
+              'The account "$email" has been blocked by an administrator. Please contact support for assistance.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        // Sign out from Google to prevent cached login
+        await _googleSignIn.signOut();
+        return;
+      }
+      
       if (!enhancedAuth.isEmailRegistered(email)) {
         if (!mounted) return;
         setState(() => _loading = false);

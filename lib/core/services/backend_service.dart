@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../config/app_config.dart';
+import 'package:clean_flutter/core/config/app_config.dart';
 
 class BackendService {
   // Use AppConfig for dynamic backend URL

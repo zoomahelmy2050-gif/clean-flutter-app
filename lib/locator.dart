@@ -1,67 +1,64 @@
 import 'package:get_it/get_it.dart';
-import 'core/config/app_config.dart';
-import 'core/services/api_service.dart';
-import 'features/auth/services/biometric_service.dart';
+import 'package:clean_flutter/core/config/app_config.dart';
+import 'package:clean_flutter/core/services/api_service.dart';
+import 'package:clean_flutter/features/auth/services/biometric_service.dart';
 import 'features/admin/services/threat_intelligence_service.dart';
 import 'features/admin/services/incident_response_service.dart' as admin_incident;
 import 'features/admin/services/enhanced_user_management_service.dart';
-import 'core/services/admin_data_service.dart';
+import 'package:clean_flutter/core/services/admin_data_service.dart';
 import 'features/admin/services/siem_integration_service.dart';
 import 'features/admin/services/logging_service.dart';
 import 'features/auth/services/risk_based_auth_service.dart';
-import 'core/services/categories_service.dart';
-import 'core/services/conflict_resolution_service.dart';
-import 'core/services/keyboard_shortcuts_service.dart';
+import 'package:clean_flutter/core/services/categories_service.dart';
+import 'package:clean_flutter/core/services/conflict_resolution_service.dart';
+import 'package:clean_flutter/core/services/keyboard_shortcuts_service.dart';
 import 'features/admin/services/real_time_monitoring_service.dart';
 import 'features/admin/services/security_drills_service.dart';
 import 'package:clean_flutter/features/admin/services/ai_security_copilot_service.dart';
 import 'package:clean_flutter/features/admin/services/dashboard_customization_service.dart';
 import 'package:clean_flutter/features/admin/services/zero_trust_service.dart';
-import 'features/admin/services/forensics_investigation_service.dart';
-import 'features/admin/services/third_party_integrations_service.dart';
-import 'features/admin/services/compliance_reporting_service.dart' as admin_compliance;
-import 'features/admin/services/ai_assistant_service.dart';
-import 'features/admin/services/ai_engineering_expert_service.dart';
-import 'features/admin/services/security_orchestration_service.dart';
-import 'features/admin/services/enhanced_security_orchestration_service.dart';
-import 'features/admin/services/performance_monitoring_service.dart';
-import 'features/admin/services/enhanced_performance_monitoring_service.dart';
-import 'features/admin/services/emerging_threats_service.dart';
-import 'features/admin/services/enhanced_emerging_threats_service.dart';
-import 'core/services/captcha_service.dart';
-import 'core/services/privacy_dashboard_service.dart';
-import 'core/services/role_management_service.dart';
-import 'core/services/user_activity_service.dart';
-import 'core/services/security_settings_service.dart';
-import 'core/services/database_migration_service.dart';
-import 'core/services/backend_sync_service.dart';
-import 'core/services/migration_service.dart';
-import 'features/auth/services/auth_service.dart';
-import 'package:clean_flutter/core/services/api_service.dart';
-import 'core/services/notification_service.dart';
-import 'core/services/database_service.dart';
-import 'core/services/connectivity_service.dart';
-import 'core/services/backend_auth_service.dart';
-import 'core/services/realtime_notification_service.dart';
-import 'core/services/background_sync_service.dart';
-import 'core/services/webauthn_service.dart';
-import 'package:clean_flutter/core/services/api_service.dart';
-import 'core/services/notification_service.dart';
-import 'core/services/database_service.dart';
-import 'core/services/connectivity_service.dart';
-import 'core/services/backend_auth_service.dart';
-import 'core/services/backend_threat_intelligence_service.dart';
-import 'core/services/backend_security_analytics_service.dart';
-import 'core/services/backend_websocket_service.dart';
-import 'core/services/smart_form_validation_service.dart';
-import 'core/services/backend_user_management_service.dart';
-import 'core/services/backend_notification_service.dart';
-import 'core/services/user_profile_service.dart';
-import 'core/services/session_management_service.dart';
-import 'core/services/security_data_service.dart';
-import 'core/services/file_export_service.dart';
-import 'core/services/encrypted_storage_service.dart';
-import 'core/services/totp_manager_service.dart';
+import 'package:clean_flutter/features/admin/services/forensics_investigation_service.dart';
+import 'package:clean_flutter/features/admin/services/third_party_integrations_service.dart';
+import 'package:clean_flutter/features/admin/services/compliance_reporting_service.dart' as admin_compliance;
+import 'package:clean_flutter/features/admin/services/ai_assistant_service.dart';
+import 'package:clean_flutter/features/admin/services/ai_engineering_expert_service.dart';
+import 'package:clean_flutter/features/admin/services/security_orchestration_service.dart';
+import 'package:clean_flutter/features/admin/services/enhanced_security_orchestration_service.dart';
+import 'package:clean_flutter/features/admin/services/performance_monitoring_service.dart';
+import 'package:clean_flutter/features/admin/services/enhanced_performance_monitoring_service.dart';
+import 'package:clean_flutter/features/admin/services/emerging_threats_service.dart';
+import 'package:clean_flutter/features/admin/services/enhanced_emerging_threats_service.dart';
+import 'package:clean_flutter/core/services/captcha_service.dart';
+import 'package:clean_flutter/core/services/privacy_dashboard_service.dart';
+import 'package:clean_flutter/core/services/role_management_service.dart';
+import 'package:clean_flutter/core/services/user_activity_service.dart';
+import 'package:clean_flutter/core/services/security_settings_service.dart';
+import 'package:clean_flutter/core/services/database_migration_service.dart';
+import 'package:clean_flutter/core/services/backend_sync_service.dart';
+import 'package:clean_flutter/core/services/migration_service.dart';
+import 'package:clean_flutter/core/services/sync_service.dart';
+import 'package:clean_flutter/features/auth/services/auth_service.dart';
+// removed duplicate local import of ApiService above; using package: path
+import 'package:clean_flutter/core/services/notification_service.dart';
+import 'package:clean_flutter/core/services/database_service.dart';
+import 'package:clean_flutter/core/services/connectivity_service.dart';
+import 'package:clean_flutter/core/services/backend_auth_service.dart';
+import 'package:clean_flutter/core/services/realtime_notification_service.dart';
+import 'package:clean_flutter/core/services/background_sync_service.dart';
+import 'package:clean_flutter/core/services/webauthn_service.dart';
+// removed second duplicate of ApiService and core service imports
+import 'package:clean_flutter/core/services/backend_threat_intelligence_service.dart';
+import 'package:clean_flutter/core/services/backend_security_analytics_service.dart';
+import 'package:clean_flutter/core/services/backend_websocket_service.dart';
+import 'package:clean_flutter/core/services/smart_form_validation_service.dart';
+import 'package:clean_flutter/core/services/backend_user_management_service.dart';
+import 'package:clean_flutter/core/services/backend_notification_service.dart';
+import 'package:clean_flutter/core/services/user_profile_service.dart';
+import 'package:clean_flutter/core/services/session_management_service.dart';
+import 'package:clean_flutter/core/services/security_data_service.dart';
+import 'package:clean_flutter/core/services/file_export_service.dart';
+import 'package:clean_flutter/core/services/encrypted_storage_service.dart';
+import 'package:clean_flutter/core/services/totp_manager_service.dart';
 import 'package:clean_flutter/features/admin/services/summary_email_scheduler.dart';
 import 'package:clean_flutter/features/auth/services/phone_auth_service.dart';
 import 'package:clean_flutter/core/services/theme_service.dart';
@@ -82,35 +79,35 @@ import 'package:clean_flutter/core/services/vulnerability_scanning_service.dart'
 import 'package:clean_flutter/core/services/user_behavior_analytics_service.dart';
 import 'package:clean_flutter/core/services/audit_trail_service.dart';
 import 'package:clean_flutter/core/services/health_monitoring_service.dart';
-import 'core/services/ai_powered_security_service.dart';
-import 'core/services/advanced_biometrics_service.dart';
-import 'core/services/smart_onboarding_service.dart';
-import 'core/services/enhanced_accessibility_service.dart';
-import 'core/services/localization_service.dart';
-import 'core/services/multi_tenant_service.dart';
-import 'core/services/executive_reporting_service.dart';
-import 'core/services/integration_hub_service.dart';
-import 'core/services/api_gateway_service.dart';
-import 'core/services/feature_flag_service.dart';
-import 'core/services/advanced_encryption_service.dart';
-import 'core/services/security_testing_service.dart';
-import 'core/services/device_security_service.dart';
-import 'core/services/offline_security_service.dart';
-import 'core/services/business_intelligence_service.dart';
-import 'core/services/threat_intelligence_platform.dart';
-import 'core/services/real_time_analytics_service.dart';
-import 'core/services/automated_incident_response_service.dart';
-import 'core/services/hardware_mfa_service.dart';
-import 'core/services/zero_trust_network_service.dart';
-import 'core/services/quantum_resistant_crypto_service.dart';
-import 'core/services/security_compliance_automation_service.dart';
-import 'core/services/mobile_device_management_service.dart';
-import 'core/services/advanced_forensics_service.dart';
-import 'core/services/production_database_service.dart';
-import 'core/services/production_crypto_service.dart';
-import 'core/services/environment_service.dart';
-import 'core/services/real_phone_auth_service.dart';
-import 'core/services/database_migration_service.dart';
+import 'package:clean_flutter/core/services/ai_powered_security_service.dart';
+import 'package:clean_flutter/core/services/advanced_biometrics_service.dart';
+import 'package:clean_flutter/core/services/smart_onboarding_service.dart';
+import 'package:clean_flutter/core/services/enhanced_accessibility_service.dart';
+import 'package:clean_flutter/core/services/localization_service.dart';
+import 'package:clean_flutter/core/services/multi_tenant_service.dart';
+import 'package:clean_flutter/core/services/executive_reporting_service.dart';
+import 'package:clean_flutter/core/services/integration_hub_service.dart';
+import 'package:clean_flutter/core/services/api_gateway_service.dart';
+import 'package:clean_flutter/core/services/feature_flag_service.dart';
+import 'package:clean_flutter/core/services/advanced_encryption_service.dart';
+import 'package:clean_flutter/core/services/security_testing_service.dart';
+import 'package:clean_flutter/core/services/device_security_service.dart';
+import 'package:clean_flutter/core/services/offline_security_service.dart';
+import 'package:clean_flutter/core/services/business_intelligence_service.dart';
+import 'package:clean_flutter/core/services/threat_intelligence_platform.dart';
+import 'package:clean_flutter/core/services/real_time_analytics_service.dart';
+import 'package:clean_flutter/core/services/automated_incident_response_service.dart';
+import 'package:clean_flutter/core/services/hardware_mfa_service.dart';
+import 'package:clean_flutter/core/services/zero_trust_network_service.dart';
+import 'package:clean_flutter/core/services/quantum_resistant_crypto_service.dart';
+import 'package:clean_flutter/core/services/security_compliance_automation_service.dart';
+import 'package:clean_flutter/core/services/mobile_device_management_service.dart';
+import 'package:clean_flutter/core/services/advanced_forensics_service.dart';
+import 'package:clean_flutter/core/services/production_database_service.dart';
+import 'package:clean_flutter/core/services/production_crypto_service.dart';
+import 'package:clean_flutter/core/services/environment_service.dart';
+import 'package:clean_flutter/core/services/real_phone_auth_service.dart';
+import 'package:clean_flutter/core/services/database_migration_service.dart';
 import 'core/services/production_backend_service.dart' as prod_backend;
 import 'package:clean_flutter/features/admin/services/email_settings_service.dart';
 import 'package:clean_flutter/features/admin/services/mfa_settings_service.dart';
@@ -119,15 +116,37 @@ import 'package:clean_flutter/core/services/email_service.dart';
 import 'package:clean_flutter/core/services/language_service.dart';
 import 'package:clean_flutter/core/services/enhanced_auth_service.dart';
 import 'package:clean_flutter/core/services/advanced_login_monitor.dart';
+import 'package:clean_flutter/core/services/advanced_login_security_service.dart';
 import 'package:clean_flutter/core/services/rbac_service.dart';
 import 'package:clean_flutter/core/services/enhanced_rbac_service.dart';
 import 'package:clean_flutter/core/services/rbac_audit_service.dart';
 import 'package:clean_flutter/core/services/role_persistence_service.dart';
+import 'features/admin/services/ai_chat_engine.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'features/admin/services/dynamic_workflow_service.dart';
+import 'features/admin/services/ai_prioritization_engine.dart';
+import 'features/admin/services/compliance_service.dart';
+import 'features/admin/services/anomaly_data_service.dart';
+import 'features/admin/services/evidence_pack_service.dart';
+import 'features/admin/services/safe_mode_service.dart';
+import 'features/admin/services/session_graph_service.dart';
+import 'features/admin/services/jit_access_service.dart';
+import 'features/admin/services/slo_metrics_service.dart';
+import 'features/admin/services/safety_validation_service.dart';
+import 'features/admin/services/incident_room_service.dart';
+import 'features/admin/services/slack_teams_bridge_service.dart';
+import 'features/admin/services/pii_redaction_service.dart';
+import 'features/admin/services/dev_sandbox_service.dart';
+import 'features/admin/services/gitops_workflow_service.dart';
+import 'features/admin/services/saved_views_service.dart';
 
 final GetIt locator = GetIt.instance;
 
 Future<void> setupLocator() async {
+  // If we've already initialized once, skip re-registering
+  if (locator.isRegistered<SharedPreferences>()) {
+    return;
+  }
   // Register SharedPreferences
   final prefs = await SharedPreferences.getInstance();
   locator.registerSingleton<SharedPreferences>(prefs);
@@ -139,6 +158,36 @@ Future<void> setupLocator() async {
   
   // Register API Client
   locator.registerLazySingleton<ApiService>(() => ApiService());
+  
+  // DynamicWorkflowService
+  locator.registerLazySingleton<DynamicWorkflowService>(() => DynamicWorkflowService(locator<SharedPreferences>()));
+  // AI Prioritization Engine
+  locator.registerLazySingleton<AIPrioritizationEngine>(() => AIPrioritizationEngine());
+  // Compliance Service
+  locator.registerLazySingleton<ComplianceService>(() => ComplianceService());
+  // Anomaly Data Service
+  locator.registerLazySingleton<AnomalyDataService>(() => AnomalyDataService());
+  // Evidence Pack Service
+  locator.registerLazySingleton<EvidencePackService>(() => EvidencePackService());
+  // Safe Mode Service
+  locator.registerLazySingleton<SafeModeService>(() => SafeModeService());
+  // Session Graph Service
+  locator.registerLazySingleton<SessionGraphService>(() => SessionGraphService());
+  // JIT Access Service
+  locator.registerLazySingleton<JitAccessService>(() => JitAccessService());
+  // SLO Metrics Service
+  locator.registerLazySingleton<SloMetricsService>(() => SloMetricsService());
+  // Safety Validation Service
+  locator.registerLazySingleton<SafetyValidationService>(() => SafetyValidationService());
+  // Incident Collaboration Services
+  locator.registerLazySingleton<IncidentRoomService>(() => IncidentRoomService());
+  locator.registerLazySingleton<SlackTeamsBridgeService>(() => SlackTeamsBridgeService());
+  // PII Redaction Service
+  locator.registerLazySingleton<PiiRedactionService>(() => PiiRedactionService());
+  // Dev Sandbox and GitOps
+  locator.registerLazySingleton<DevSandboxService>(() => DevSandboxService());
+  locator.registerLazySingleton<GitOpsWorkflowService>(() => GitOpsWorkflowService());
+  locator.registerLazySingleton<SavedViewsService>(() => SavedViewsService());
   
   // Register Backend Services
   locator.registerLazySingleton<BackendAuthService>(() => BackendAuthService());
@@ -157,6 +206,7 @@ Future<void> setupLocator() async {
   
   // Register Auth Services
   locator.registerLazySingleton<AuthService>(() => AuthService());
+  locator.registerLazySingleton<AdvancedLoginSecurityService>(() => AdvancedLoginSecurityService());
   locator.registerLazySingleton(() => PendingActionsService());
   locator.registerLazySingleton<BiometricService>(() => BiometricService());
   locator.registerLazySingleton<PhoneAuthService>(() => PhoneAuthService());
@@ -171,6 +221,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<AdvancedLoginMonitor>(() => AdvancedLoginMonitor());
   locator.registerLazySingleton<EnhancedAuthService>(() => EnhancedAuthService());
   locator.registerLazySingleton<SimpleSyncService>(() => SimpleSyncService());
+  locator.registerLazySingleton<SyncService>(() => SyncService());
   locator.registerLazySingleton<SummaryEmailScheduler>(() => SummaryEmailScheduler());
   locator.registerLazySingleton<LoggingService>(() => LoggingService());
   
@@ -409,4 +460,7 @@ Future<void> setupLocator() async {
   
   // Register RBAC Audit Service
   locator.registerLazySingleton<RBACAuditService>(() => RBACAuditService());
+  
+  // Register AI Chat Engine
+  locator.registerLazySingleton<AIChatEngine>(() => AIChatEngine());
 }

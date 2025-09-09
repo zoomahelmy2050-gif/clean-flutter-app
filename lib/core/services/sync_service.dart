@@ -11,11 +11,14 @@ class SyncService {
   static const String _lastSyncKey = 'last_sync_timestamp';
   static const String _syncEnabledKey = 'sync_enabled';
   
-  final BackendService _backend = locator<BackendService>();
-  late final AuthService _auth;
+  BackendService? _backend;
+  AuthService? _auth;
+  
+  BackendService get backend => _backend ??= locator<BackendService>();
+  AuthService get auth => _auth ??= locator<AuthService>();
   
   SyncService() {
-    _auth = locator<AuthService>();
+    // Lazy load dependencies
   }
   
   bool _syncEnabled = false;
@@ -40,11 +43,11 @@ class SyncService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_syncEnabledKey, false);
     _syncEnabled = false;
-    await _backend.logout();
+    await backend.logout();
   }
   
   bool get isSyncEnabled => _syncEnabled;
-  bool get isBackendAuthenticated => _backend.isAuthenticated;
+  bool get isBackendAuthenticated => backend.isAuthenticated;
   DateTime? get lastSync => _lastSync;
   
   /// Register user on backend using local password verifier
@@ -53,7 +56,7 @@ class SyncService {
       // Generate PBKDF2 v2 password verifier compatible with backend
       final passwordVerifier = await generatePasswordVerifier(password);
       
-      final result = await _backend.register(email, passwordVerifier);
+      final result = await backend.register(email, passwordVerifier);
       
       if (result['error'] == null) {
         developer.log('Successfully registered user on backend: $email', name: 'SyncService');
@@ -69,7 +72,7 @@ class SyncService {
   /// Login to backend and enable sync
   Future<Map<String, dynamic>> loginToBackend(String email, String password) async {
     try {
-      final result = await _backend.login(email, password);
+      final result = await backend.login(email, password);
       
       if (result['access_token'] != null) {
         await enableSync();
@@ -88,7 +91,7 @@ class SyncService {
   
   /// Sync local encrypted data to backend
   Future<void> syncToBackend() async {
-    if (!_syncEnabled || !_backend.isAuthenticated) {
+    if (!_syncEnabled || !backend.isAuthenticated) {
       return;
     }
     
@@ -97,12 +100,10 @@ class SyncService {
       developer.log('Sync upload initiated (mock implementation)');
       
       // Placeholder for encrypted data upload
-      await _backend.putBlob(
-        'sync_data',
+      await backend.putBlob('sync_data',
         ciphertext: 'mock_encrypted_data',
         nonce: 'mock_nonce',
         mac: 'mock_mac',
-        aad: 'mock_aad',
         version: '1',
       );
       
@@ -115,19 +116,19 @@ class SyncService {
   
   /// Sync data from backend to local storage
   Future<void> syncFromBackend() async {
-    if (!_syncEnabled || !_backend.isAuthenticated) {
+    if (!_syncEnabled || !backend.isAuthenticated) {
       return;
     }
     
     try {
       // Get TOTP secrets from backend
-      final totpBlob = await _backend.getBlob('totp_secrets');
-      if (totpBlob != null) {
-        await _restoreEncryptedTotpSecrets(totpBlob);
+      final blob = await backend.getBlob('totp_secrets');
+      if (blob != null) {
+        await _restoreEncryptedTotpSecrets(blob);
       }
       
       // Get user settings from backend
-      final settingsBlob = await _backend.getBlob('user_settings');
+      final settingsBlob = await backend.getBlob('user_settings');
       if (settingsBlob != null) {
         await _restoreEncryptedUserSettings(settingsBlob);
       }
@@ -141,7 +142,7 @@ class SyncService {
   
   /// Check backend health
   Future<bool> checkBackendHealth() async {
-    return await _backend.healthCheck();
+    return await backend.healthCheck();
   }
   
   /// Generate password verifier for sync authentication (mock implementation)
@@ -190,10 +191,11 @@ class SyncService {
         'mfa_enabled': 'true',
         'mfa_method': 'totp',
         'biometric_enabled': 'false',
+        'lastLogin': auth.currentUser ?? 'anonymous',
       };
       
       // Apply the restored settings
-      final currentUser = _auth.currentUser;
+      final currentUser = auth.currentUser;
       if (currentUser != null) {
         // Note: You may need to add public methods to AuthService to update these settings
         developer.log('Restored user settings from backend: $mockDecrypted', name: 'SyncService');

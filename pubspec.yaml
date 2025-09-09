@@ -49,6 +49,7 @@ dependencies:
   
   # Authentication & Social Login
   google_sign_in: ^6.1.6
+  flutter_facebook_auth: ^7.0.1
   
   # Storage & Preferences
   shared_preferences: ^2.3.2
@@ -86,6 +87,8 @@ dependencies:
   socket_io_client: ^2.0.3+1
   # External APIs
   dio: ^5.4.3+1
+  # AI Integration
+  google_generative_ai: ^0.4.3
   # Security & Crypto
   jose: ^0.3.4
   # Monitoring & Analytics

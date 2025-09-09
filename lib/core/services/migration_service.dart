@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
@@ -44,7 +45,7 @@ class MigrationService extends ChangeNotifier {
       final response = await http.get(
         Uri.parse('${AppConfig.backendUrl}/migrations/status'),
         headers: _headers,
-      );
+      ).timeout(const Duration(seconds: 10));
       
       if (response.statusCode == 401) {
         // Token expired, try to login again
@@ -53,7 +54,7 @@ class MigrationService extends ChangeNotifier {
         final retryResponse = await http.get(
           Uri.parse('${AppConfig.backendUrl}/migrations/status'),
           headers: _headers,
-        );
+        ).timeout(const Duration(seconds: 10));
         if (retryResponse.statusCode == 200) {
           final data = json.decode(retryResponse.body);
           _status = MigrationStatus.fromJson(data);
@@ -72,6 +73,13 @@ class MigrationService extends ChangeNotifier {
       } else {
         throw Exception('Failed to fetch migration status: ${response.statusCode}');
       }
+    } on TimeoutException catch (_) {
+      _error = 'Connection timeout - Backend server not responding';
+      _status = MigrationStatus(
+        migrations: [],
+        databaseConnected: false,
+        error: 'Connection timeout',
+      );
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -90,17 +98,21 @@ class MigrationService extends ChangeNotifier {
           'email': 'env.hygiene@gmail.com',
           'password': 'password',
         }),
-      );
+      ).timeout(const Duration(seconds: 10));
       
       if (loginResponse.statusCode == 200) {
         final loginData = json.decode(loginResponse.body);
-        final token = loginData['access_token'] ?? loginData['token'];
+        final token = loginData['accessToken'];
         if (token != null) {
           await _databaseService.saveAuthToken(token);
+        } else {
+          throw Exception('No access token in login response');
         }
       } else {
-        throw Exception('Backend login failed');
+        throw Exception('Backend login failed: ${loginResponse.statusCode} - ${loginResponse.body}');
       }
+    } on TimeoutException catch (_) {
+      throw Exception('Connection timeout - Backend server not responding');
     } catch (e) {
       throw Exception('Failed to authenticate with backend: $e');
     }
@@ -115,11 +127,11 @@ class MigrationService extends ChangeNotifier {
           'email': email,
           'password': password,
         }),
-      );
+      ).timeout(const Duration(seconds: 10));
       
       if (loginResponse.statusCode == 200) {
         final loginData = json.decode(loginResponse.body);
-        final token = loginData['access_token'] ?? loginData['token'];
+        final token = loginData['accessToken'];
         if (token != null) {
           await _databaseService.saveAuthToken(token);
           // Fetch status after successful login
@@ -127,6 +139,10 @@ class MigrationService extends ChangeNotifier {
           return true;
         }
       }
+      return false;
+    } on TimeoutException catch (_) {
+      _error = 'Connection timeout - Backend server not responding';
+      notifyListeners();
       return false;
     } catch (e) {
       _error = 'Login failed: $e';

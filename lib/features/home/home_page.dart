@@ -16,6 +16,8 @@ import 'package:clean_flutter/features/auth/security_account_center_page.dart';
 import 'package:clean_flutter/features/profile/profile_page.dart';
 import 'package:clean_flutter/features/auth/totp/totp_enroll_page.dart';
 import 'package:clean_flutter/features/auth/totp/totp_verify_page.dart';
+import 'package:clean_flutter/features/admin/screens/ai_workflows_screen.dart';
+import 'package:clean_flutter/features/admin/screens/ai_assistant_screen.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'dart:typed_data';
 import 'dart:io';
@@ -185,8 +187,12 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadUserRole() async {
     final authService = locator<AuthService>();
     if (authService.currentUser != null) {
+      final role = authService.getUserRole(authService.currentUser!);
+      print('DEBUG: Current user: ${authService.currentUser}');
+      print('DEBUG: User role: ${role.name} (level: ${role.level})');
+      print('DEBUG: Superuser level: ${UserRole.superuser.level}');
       setState(() {
-        _userRole = authService.getUserRole(authService.currentUser!);
+        _userRole = role;
       });
     }
   }
@@ -236,12 +242,28 @@ class _HomePageState extends State<HomePage> {
         selectedIcon: const Icon(Icons.person),
         label: l10n.profile,
       ),
+      NavigationDestination(
+        icon: const Icon(Icons.smart_toy_outlined),
+        selectedIcon: const Icon(Icons.smart_toy),
+        label: 'AI Assistant',
+      ),
     ];
+    
+    // Add AI Assistant page
+    allPages.add(const AIAssistantScreen());
 
     // Add role-based navigation items
+    final authService = locator<AuthService>();
+    
+    // Debug logging
+    print('DEBUG: Building navigation with role: ${_userRole?.name} (level: ${_userRole?.level})');
+    print('DEBUG: Current user email: ${authService.currentUser}');
+    print('DEBUG: Is superuser check: ${_userRole?.level} >= ${UserRole.superuser.level}');
+    
     if (_userRole != null) {
       if (_userRole!.level >= UserRole.staff.level) {
         // Staff and above can access user management
+        print('DEBUG: Adding Users tab for staff level');
         allDestinations.add(
           const NavigationDestination(
             icon: Icon(Icons.group_outlined),
@@ -252,7 +274,12 @@ class _HomePageState extends State<HomePage> {
         allPages.add(const StaffUserManagementPage());
       }
       
-      if (_userRole!.level >= UserRole.superuser.level) {
+      // Force add AI Workflows for env.hygiene@gmail.com
+      if (_userRole!.level >= UserRole.superuser.level || 
+          authService.currentUser?.toLowerCase() == 'env.hygiene@gmail.com') {
+        print('DEBUG: User qualifies for superuser features');
+        print('DEBUG: Adding superuser tabs...');
+        
         // Only superusers can access approval dashboard
         allDestinations.add(
           const NavigationDestination(
@@ -272,8 +299,22 @@ class _HomePageState extends State<HomePage> {
           ),
         );
         allPages.add(const SecurityCenterPage());
+        
+        // Add AI Workflows for superusers
+        print('DEBUG: Adding AI Workflows tab');
+        allDestinations.add(
+          const NavigationDestination(
+            icon: Icon(Icons.account_tree_outlined),
+            selectedIcon: Icon(Icons.account_tree),
+            label: 'AI Workflows',
+          ),
+        );
+        allPages.add(const AIWorkflowsScreen());
       }
     }
+    
+    print('DEBUG: Total destinations: ${allDestinations.length}');
+    print('DEBUG: Total pages: ${allPages.length}');
 
     return Scaffold(
       appBar: AppBar(

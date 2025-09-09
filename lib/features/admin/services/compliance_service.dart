@@ -1,8 +1,35 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:convert';
 import '../../../core/models/compliance_models.dart';
 import '../../../locator.dart';
 import 'dart:developer' as developer;
+
+class ComplianceCheckResult {
+  final String id;
+  final String name;
+  final bool passed;
+  final String severity; // low, medium, high
+  final String? details;
+
+  ComplianceCheckResult({
+    required this.id,
+    required this.name,
+    required this.passed,
+    required this.severity,
+    this.details,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'passed': passed,
+    'severity': severity,
+    'details': details,
+  };
+}
+
+// Removed local ComplianceReport class to avoid conflicts; use model from core/models
 
 class ComplianceService {
   final List<ComplianceFramework> _frameworks = [];
@@ -700,5 +727,87 @@ class ComplianceService {
   Future<List<ComplianceReport>> getComplianceReports() async {
     await Future.delayed(const Duration(milliseconds: 300));
     return List.from(_reports);
+  }
+
+  Future<ComplianceReport> runChecks({Map<String, dynamic>? context}) async {
+    final checks = <ComplianceCheckResult>[];
+
+    // Example checks
+    checks.add(_passwordPolicy(context));
+    checks.add(_mfaEnforcement(context));
+    checks.add(_dataEncryption(context));
+    checks.add(_ipBlockingPolicy(context));
+
+    final score = _computeScore(checks);
+    final findings = {
+      'score': score,
+      'totalChecks': checks.length,
+      'passed': checks.where((c) => c.passed).length,
+      'failed': checks.where((c) => !c.passed).length,
+      'results': checks.map((c) => c.toJson()).toList(),
+    };
+
+    return ComplianceReport(
+      id: 'auto_${DateTime.now().millisecondsSinceEpoch}',
+      title: 'Automated Compliance Checks',
+      description: 'Automated compliance assessment snapshot',
+      type: 'Automated',
+      generatedAt: DateTime.now(),
+      generatedBy: 'System',
+      frameworkIds: const [],
+      findings: findings,
+    );
+  }
+
+  ComplianceCheckResult _passwordPolicy(Map<String, dynamic>? ctx) {
+    final enabled = (ctx?['passwordPolicyEnabled'] ?? true) == true;
+    return ComplianceCheckResult(
+      id: 'password_policy',
+      name: 'Password Policy Enforcement',
+      passed: enabled,
+      severity: enabled ? 'low' : 'high',
+      details: enabled ? null : 'Password policy is disabled',
+    );
+  }
+
+  ComplianceCheckResult _mfaEnforcement(Map<String, dynamic>? ctx) {
+    final required = (ctx?['mfaRequired'] ?? true) == true;
+    return ComplianceCheckResult(
+      id: 'mfa_required',
+      name: 'MFA Required for High-Risk',
+      passed: required,
+      severity: required ? 'low' : 'high',
+      details: required ? null : 'MFA is not enforced for high-risk scenarios',
+    );
+  }
+
+  ComplianceCheckResult _dataEncryption(Map<String, dynamic>? ctx) {
+    final atRest = (ctx?['encryptionAtRest'] ?? true) == true;
+    final inTransit = (ctx?['encryptionInTransit'] ?? true) == true;
+    final passed = atRest && inTransit;
+    return ComplianceCheckResult(
+      id: 'data_encryption',
+      name: 'Data Encryption',
+      passed: passed,
+      severity: passed ? 'low' : 'high',
+      details: passed ? null : 'Encryption at rest or in transit is disabled',
+    );
+  }
+
+  ComplianceCheckResult _ipBlockingPolicy(Map<String, dynamic>? ctx) {
+    final enabled = (ctx?['ipBlockingEnabled'] ?? true) == true;
+    return ComplianceCheckResult(
+      id: 'ip_blocking',
+      name: 'IP Blocking Policy',
+      passed: enabled,
+      severity: enabled ? 'low' : 'medium',
+      details: enabled ? null : 'IP Blocking is disabled',
+    );
+  }
+
+  double _computeScore(List<ComplianceCheckResult> results) {
+    if (results.isEmpty) return 0.0;
+    final passed = results.where((r) => r.passed).length;
+    return (passed / results.length) * 100.0;
   }
 }

@@ -11,7 +11,7 @@ import 'package:clean_flutter/core/services/device_security_service.dart';
 import 'package:clean_flutter/core/services/threat_intelligence_platform.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  // Binding is initialized in flutter_test_config.dart; avoid re-initializing here
 
   group('Advanced Security Integration Tests', () {
     setUpAll(() async {

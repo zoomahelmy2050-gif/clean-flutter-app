@@ -16,7 +16,10 @@ class _DatabaseMigrationScreenState extends State<DatabaseMigrationScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAuthAndLoadStatus();
+    // Defer dialog showing until after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthAndLoadStatus();
+    });
     _startAutoSync();
   }
   
@@ -67,7 +70,26 @@ class _DatabaseMigrationScreenState extends State<DatabaseMigrationScreen> {
       body: Consumer2<MigrationService, BackendSyncService>(
         builder: (context, migrationService, syncService, child) {
           if (migrationService.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Connecting to backend...',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'This may take 30-60 seconds if the server is waking up',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
           return SingleChildScrollView(
@@ -111,6 +133,13 @@ class _DatabaseMigrationScreenState extends State<DatabaseMigrationScreen> {
                   'Database Status',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
+                const Spacer(),
+                if (service.error?.contains('timeout') ?? false)
+                  TextButton.icon(
+                    onPressed: () => _checkAuthAndLoadStatus(),
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text('Retry'),
+                  ),
               ],
             ),
             const SizedBox(height: 16),
@@ -119,6 +148,14 @@ class _DatabaseMigrationScreenState extends State<DatabaseMigrationScreen> {
             _buildInfoRow('Backend URL', AppConfig.backendUrl),
             if (status?.error != null)
               _buildInfoRow('Error', status!.error!, isError: true),
+            if (service.error?.contains('timeout') ?? false)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Render backend may be sleeping. It can take 30-60 seconds to wake up.',
+                  style: TextStyle(color: Colors.orange, fontSize: 12),
+                ),
+              ),
           ],
         ),
       ),

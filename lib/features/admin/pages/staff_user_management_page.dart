@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../features/auth/services/auth_service.dart';
 import '../../../core/services/pending_actions_service.dart';
 import '../../../core/models/rbac_models.dart';
-import '../../../l10n/app_localizations.dart';
+import '../../../generated/app_localizations.dart';
 
 class StaffUserManagementPage extends StatefulWidget {
   const StaffUserManagementPage({Key? key}) : super(key: key);

@@ -16,7 +16,7 @@ import 'threat_intelligence_dashboard.dart';
 import 'view_logs_page.dart';
 import 'security_settings_page.dart';
 import 'summary_emails_page.dart';
-import 'pages/ai_assistant_page.dart';
+import 'pages/ai_assistant_page.dart' as ai_page;
 import 'dart:ui' as ui;
 import 'dart:io';
 import 'package:flutter/rendering.dart';
@@ -52,6 +52,8 @@ import 'pages/security_orchestration_page.dart';
 import 'pages/performance_monitoring_page.dart';
 import 'pages/role_management_page.dart';
 import 'pages/emerging_threats_page.dart';
+import 'screens/ai_workflows_screen.dart';
+import 'package:clean_flutter/features/admin/ui/admin_security_center_page.dart';
 
 class SecurityCenterPage extends StatefulWidget {
   const SecurityCenterPage({super.key});
@@ -661,6 +663,16 @@ class _SecurityCenterPageState extends State<SecurityCenterPage> {
                         label: const Text('Export logs (CSV)'),
                         style: compactOutlinedButtonStyle,
                       ),
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const AdminSecurityCenterPage()),
+                          );
+                        },
+                        icon: const Icon(Icons.admin_panel_settings_outlined),
+                        label: const Text('Admin Security Center'),
+                        style: compactOutlinedButtonStyle,
+                      ),
                     ],
                   ); // End Wrap
                   }), // End Builder
@@ -679,16 +691,6 @@ class _SecurityCenterPageState extends State<SecurityCenterPage> {
                 childAspectRatio: 1.0,
               ),
               delegate: SliverChildListDelegate([
-                _ActionCard(
-                  icon: Icons.storage,
-                  title: 'Database Migration',
-                  subtitle: 'Manage database sync & migrations',
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const DatabaseMigrationScreen()),
-                    );
-                  },
-                ),
                 _buildEnhancedRBACCard(
                   context: context,
                   permission: Permission.manageRoles,
@@ -725,6 +727,19 @@ class _SecurityCenterPageState extends State<SecurityCenterPage> {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const SummaryEmailsPage()),
+                    );
+                  },
+                ),
+                // AI Workflows direct access
+                _ActionCard(
+                  icon: Icons.smart_toy,
+                  title: 'AI Workflows',
+                  subtitle: 'AI automation & chat',
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const AIWorkflowsScreen(),
+                      ),
                     );
                   },
                 ),
@@ -843,7 +858,7 @@ class _SecurityCenterPageState extends State<SecurityCenterPage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const AIAssistantPage()),
+                      MaterialPageRoute(builder: (_) => const ai_page.AIAssistantPage()),
                     );
                   },
                 ),

@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as status;
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'notification_service.dart';
-import 'api_service.dart';
+import 'package:clean_flutter/core/services/notification_service.dart';
+import 'package:clean_flutter/core/services/api_service.dart';
 import 'dart:developer' as developer;
 
 class RealtimeNotificationService extends ChangeNotifier {

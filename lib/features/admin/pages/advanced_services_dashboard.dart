@@ -11,6 +11,7 @@ import '../../../core/services/offline_security_service.dart';
 import '../../../core/services/business_intelligence_service.dart';
 import '../../../core/services/threat_intelligence_platform.dart';
 import '../../../locator.dart';
+import 'dart:async';
 
 class AdvancedServicesDashboard extends StatefulWidget {
   const AdvancedServicesDashboard({super.key});
@@ -32,122 +33,132 @@ class _AdvancedServicesDashboardState extends State<AdvancedServicesDashboard> {
 
   Future<void> _loadServiceStatus() async {
     setState(() => _isLoading = true);
-    
-    try {
-      // AI-Powered Security Service
-      _serviceStatus['ai_security'] = true;
-      _serviceMetrics['ai_security'] = {
-        'threats_detected': '127',
-        'risk_score': '8.2',
-        'alerts_today': '15',
-        'status': 'Active'
-      };
 
-      // Advanced Biometrics Service
-      _serviceStatus['biometrics'] = true;
-      _serviceMetrics['biometrics'] = {
-        'enrolled_users': '1,234',
-        'success_rate': '98.7%',
-        'failed_attempts': '23',
-        'status': 'Active'
-      };
+    final Completer<void> refreshCompleter = Completer<void>();
 
-      // Smart Onboarding Service
-      _serviceStatus['onboarding'] = true;
-      _serviceMetrics['onboarding'] = {
-        'active_flows': '45',
-        'completion_rate': '92.3%',
-        'avg_time': '4.2 min',
-        'status': 'Active'
-      };
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        // AI-Powered Security Service
+        _serviceStatus['ai_security'] = true;
+        _serviceMetrics['ai_security'] = {
+          'threats_detected': '127',
+          'risk_score': '8.2',
+          'alerts_today': '15',
+          'status': 'Active'
+        };
 
-      // Enhanced Accessibility Service
-      final accessibilityService = locator<EnhancedAccessibilityService>();
-      _serviceStatus['accessibility'] = true;
-      _serviceMetrics['accessibility'] = accessibilityService.getAccessibilityMetrics();
+        // Advanced Biometrics Service
+        _serviceStatus['biometrics'] = true;
+        _serviceMetrics['biometrics'] = {
+          'enrolled_users': '1,234',
+          'success_rate': '98.7%',
+          'failed_attempts': '23',
+          'status': 'Active'
+        };
 
-      // Localization Service
-      final localizationService = locator<LocalizationService>();
-      _serviceStatus['localization'] = true;
-      _serviceMetrics['localization'] = localizationService.getLocalizationMetrics();
+        // Smart Onboarding Service
+        _serviceStatus['onboarding'] = true;
+        _serviceMetrics['onboarding'] = {
+          'active_flows': '45',
+          'completion_rate': '92.3%',
+          'avg_time': '4.2 min',
+          'status': 'Active'
+        };
 
-      // Multi-Tenant Service
-      _serviceStatus['multi_tenant'] = true;
-      _serviceMetrics['multi_tenant'] = {
-        'active_tenants': '12',
-        'total_users': '5,678',
-        'storage_used': '2.3 GB',
-        'status': 'Active'
-      };
+        // Enhanced Accessibility Service
+        final accessibilityService = locator<EnhancedAccessibilityService>();
+        _serviceStatus['accessibility'] = true;
+        _serviceMetrics['accessibility'] = accessibilityService.getAccessibilityMetrics();
 
-      // Executive Reporting Service
-      final reportingService = locator<ExecutiveReportingService>();
-      _serviceStatus['reporting'] = true;
-      _serviceMetrics['reporting'] = reportingService.getReportingMetrics();
+        // Localization Service
+        final localizationService = locator<LocalizationService>();
+        _serviceStatus['localization'] = true;
+        _serviceMetrics['localization'] = localizationService.getLocalizationMetrics();
 
-      // Integration Hub Service
-      final integrationService = locator<IntegrationHubService>();
-      _serviceStatus['integration'] = true;
-      _serviceMetrics['integration'] = integrationService.getIntegrationMetrics();
+        // Multi-Tenant Service
+        _serviceStatus['multi_tenant'] = true;
+        _serviceMetrics['multi_tenant'] = {
+          'active_tenants': '12',
+          'total_users': '5,678',
+          'storage_used': '2.3 GB',
+          'status': 'Active'
+        };
 
-      // API Gateway Service
-      _serviceStatus['api_gateway'] = true;
-      _serviceMetrics['api_gateway'] = {
-        'requests_today': '45,231',
-        'avg_response': '125ms',
-        'error_rate': '0.3%',
-        'status': 'Active'
-      };
+        // Executive Reporting Service
+        final reportingService = locator<ExecutiveReportingService>();
+        _serviceStatus['reporting'] = true;
+        _serviceMetrics['reporting'] = reportingService.getReportingMetrics();
 
-      // Health Monitoring Service
-      _serviceStatus['health_monitoring'] = true;
-      _serviceMetrics['health_monitoring'] = {
-        'system_health': '98.5%',
-        'uptime': '99.9%',
-        'alerts_active': '2',
-        'status': 'Active'
-      };
+        // Integration Hub Service
+        final integrationService = locator<IntegrationHubService>();
+        _serviceStatus['integration'] = true;
+        _serviceMetrics['integration'] = integrationService.getIntegrationMetrics();
 
-      // Feature Flag Service
-      final featureFlagService = locator<FeatureFlagService>();
-      _serviceStatus['feature_flags'] = true;
-      _serviceMetrics['feature_flags'] = featureFlagService.getFeatureFlagMetrics();
+        // API Gateway Service
+        _serviceStatus['api_gateway'] = true;
+        _serviceMetrics['api_gateway'] = {
+          'requests_today': '45,231',
+          'avg_response': '125ms',
+          'error_rate': '0.3%',
+          'status': 'Active'
+        };
 
-      // Advanced Encryption Service
-      final encryptionService = locator<AdvancedEncryptionService>();
-      _serviceStatus['encryption'] = true;
-      _serviceMetrics['encryption'] = encryptionService.getEncryptionMetrics();
+        // Health Monitoring Service
+        _serviceStatus['health_monitoring'] = true;
+        _serviceMetrics['health_monitoring'] = {
+          'system_health': '98.5%',
+          'uptime': '99.9%',
+          'alerts_active': '2',
+          'status': 'Active'
+        };
 
-      // Security Testing Service
-      final testingService = locator<SecurityTestingService>();
-      _serviceStatus['security_testing'] = true;
-      _serviceMetrics['security_testing'] = testingService.getTestingMetrics();
+        // Feature Flag Service
+        final featureFlagService = locator<FeatureFlagService>();
+        _serviceStatus['feature_flags'] = true;
+        _serviceMetrics['feature_flags'] = featureFlagService.getFeatureFlagMetrics();
 
-      // Device Security Service
-      final deviceSecurityService = locator<DeviceSecurityService>();
-      _serviceStatus['device_security'] = true;
-      _serviceMetrics['device_security'] = deviceSecurityService.getSecurityMetrics();
+        // Advanced Encryption Service
+        final encryptionService = locator<AdvancedEncryptionService>();
+        _serviceStatus['encryption'] = true;
+        _serviceMetrics['encryption'] = encryptionService.getEncryptionMetrics();
 
-      // Offline Security Service
-      final offlineSecurityService = locator<OfflineSecurityService>();
-      _serviceStatus['offline_security'] = true;
-      _serviceMetrics['offline_security'] = offlineSecurityService.getOfflineSecurityMetrics();
+        // Security Testing Service
+        final testingService = locator<SecurityTestingService>();
+        _serviceStatus['security_testing'] = true;
+        _serviceMetrics['security_testing'] = testingService.getTestingMetrics();
 
-      // Business Intelligence Service
-      final biService = locator<BusinessIntelligenceService>();
-      _serviceStatus['business_intelligence'] = true;
-      _serviceMetrics['business_intelligence'] = biService.getBusinessIntelligenceMetrics();
+        // Device Security Service
+        final deviceSecurityService = locator<DeviceSecurityService>();
+        _serviceStatus['device_security'] = true;
+        _serviceMetrics['device_security'] = deviceSecurityService.getSecurityMetrics();
 
-      // Threat Intelligence Platform
-      final threatIntelService = locator<ThreatIntelligencePlatform>();
-      _serviceStatus['threat_intelligence'] = true;
-      _serviceMetrics['threat_intelligence'] = threatIntelService.getPlatformMetrics();
+        // Offline Security Service
+        final offlineSecurityService = locator<OfflineSecurityService>();
+        _serviceStatus['offline_security'] = true;
+        _serviceMetrics['offline_security'] = offlineSecurityService.getOfflineSecurityMetrics();
 
-    } catch (e) {
-      debugPrint('Error loading service status: $e');
-    } finally {
-      setState(() => _isLoading = false);
-    }
+        // Business Intelligence Service
+        final biService = locator<BusinessIntelligenceService>();
+        _serviceStatus['business_intelligence'] = true;
+        _serviceMetrics['business_intelligence'] = biService.getBusinessIntelligenceMetrics();
+
+        // Threat Intelligence Platform
+        final threatIntelService = locator<ThreatIntelligencePlatform>();
+        _serviceStatus['threat_intelligence'] = true;
+        _serviceMetrics['threat_intelligence'] = threatIntelService.getPlatformMetrics();
+      } catch (e) {
+        debugPrint('Error loading service status: $e');
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+        if (!refreshCompleter.isCompleted) {
+          refreshCompleter.complete();
+        }
+      }
+    });
+
+    return refreshCompleter.future;
   }
 
   @override
@@ -163,11 +174,21 @@ class _AdvancedServicesDashboardState extends State<AdvancedServicesDashboard> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadServiceStatus,
+      body: Stack(
+        children: [
+          RefreshIndicator(
+            onRefresh: _loadServiceStatus,
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification is OverscrollNotification) {
+                  if (!_isLoading) {
+                    setState(() => _isLoading = true);
+                  }
+                }
+                return false;
+              },
               child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 children: [
                   _buildOverviewCard(),
@@ -176,6 +197,11 @@ class _AdvancedServicesDashboardState extends State<AdvancedServicesDashboard> {
                 ],
               ),
             ),
+          ),
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator()),
+        ],
+      ),
     );
   }
 
@@ -508,33 +534,35 @@ class _AdvancedServicesDashboardState extends State<AdvancedServicesDashboard> {
         ),
         content: SizedBox(
           width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Service Metrics',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 16),
-              if (metrics.isEmpty)
-                const Text('No metrics available')
-              else
-                ...metrics.entries.map((entry) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          entry.key.replaceAll('_', ' ').toUpperCase(),
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Service Metrics',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 16),
+                if (metrics.isEmpty)
+                  const Text('No metrics available')
+                else
+                  ...metrics.entries.map((entry) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            entry.key.replaceAll('_', ' ').toUpperCase(),
+                            style: const TextStyle(fontWeight: FontWeight.w500),
+                          ),
                         ),
-                      ),
-                      Text(entry.value.toString()),
-                    ],
-                  ),
-                )),
-            ],
+                        Text(entry.value.toString()),
+                      ],
+                    ),
+                  )),
+              ],
+            ),
           ),
         ),
         actions: [

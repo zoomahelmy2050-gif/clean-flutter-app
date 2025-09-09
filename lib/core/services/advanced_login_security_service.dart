@@ -4,6 +4,10 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer' as developer;
+import 'package:clean_flutter/locator.dart'; // Import locator
+import 'package:clean_flutter/core/services/advanced_login_monitor.dart'; // Import AdvancedLoginMonitor
+import 'package:clean_flutter/features/admin/services/dynamic_workflow_service.dart'; // Correct path for DynamicWorkflowService
+import 'package:clean_flutter/core/services/xai_logger.dart';
 
 enum RiskLevel { low, medium, high, critical }
 
@@ -162,16 +166,24 @@ class AdvancedLoginSecurityService with ChangeNotifier {
     }
   }
 
-  double _calculateRisk(String email, String? ipAddress) {
+  double _calculateRisk(String email, String? ipAddress, {String? userAgent}) {
     double risk = 0.0;
     
-    if (ipAddress != null && _maliciousIps.contains(ipAddress)) risk += 50.0;
+    // Use AdvancedLoginMonitor's blacklist
+    if (ipAddress != null && locator<AdvancedLoginMonitor>().blacklistedIPs.contains(ipAddress)) {
+      risk += 70.0; // Higher risk for IPs already blacklisted by monitor
+    }
+    
+    // Bot/automation user agent penalty
+    if (userAgent != null && userAgent.toLowerCase().contains('bot')) {
+      risk += 40.0;
+    }
     
     final failedCount = _getFailedCount(email);
-    risk += failedCount * 8.0;
+    risk += failedCount * 10.0; // steeper per-failure penalty
     
     final ipFailedCount = ipAddress != null ? _getIpFailedCount(ipAddress) : 0;
-    risk += ipFailedCount * 3.0;
+    risk += ipFailedCount * 5.0;
     
     return math.min(risk, 100.0);
   }
@@ -203,6 +215,16 @@ class AdvancedLoginSecurityService with ChangeNotifier {
       final lockExpiry = _lockedUsers[normalizedEmail]!;
       if (DateTime.now().isBefore(lockExpiry)) {
         final remainingMinutes = lockExpiry.difference(DateTime.now()).inMinutes;
+        XaiLogger.instance.log(
+          component: 'AdvancedLoginSecurityService',
+          decision: 'deny_login_user_locked',
+          context: {'email': normalizedEmail, 'remainingMinutes': remainingMinutes},
+          rationale: 'User exceeded failed attempts threshold; temporary lock active',
+          factors: [
+            {'name': 'failedAttempts', 'value': _getFailedCount(normalizedEmail), 'weight': 0.6, 'impact': 'high'},
+            {'name': 'lockoutDurationMin', 'value': lockoutDuration.inMinutes, 'weight': 0.3, 'impact': 'medium'},
+          ],
+        );
         return {
           'allowed': false,
           'error': 'Account locked due to failed attempts',
@@ -218,9 +240,19 @@ class AdvancedLoginSecurityService with ChangeNotifier {
     if (ipAddress != null && _blockedIps.containsKey(ipAddress)) {
       final blockExpiry = _blockedIps[ipAddress]!;
       if (DateTime.now().isBefore(blockExpiry)) {
+        XaiLogger.instance.log(
+          component: 'AdvancedLoginSecurityService',
+          decision: 'deny_login_ip_blocked',
+          context: {'ip': ipAddress},
+          rationale: 'IP is blocked due to repeated failures or policy',
+          factors: [
+            {'name': 'ipFailedAttempts', 'value': _getIpFailedCount(ipAddress), 'weight': 0.7, 'impact': 'high'},
+            {'name': 'policy', 'value': 'ipLockoutDuration', 'weight': 0.2, 'impact': 'medium'},
+          ],
+        );
         return {
           'allowed': false,
-          'error': 'IP address temporarily blocked',
+          'error': 'IP address is blocked',
           'lockoutMinutes': blockExpiry.difference(DateTime.now()).inMinutes,
         };
       } else {
@@ -230,11 +262,21 @@ class AdvancedLoginSecurityService with ChangeNotifier {
 
     final failedCount = _getFailedCount(normalizedEmail);
     final ipFailedCount = ipAddress != null ? _getIpFailedCount(ipAddress) : 0;
-    final riskScore = _calculateRisk(normalizedEmail, ipAddress);
+    final riskScore = _calculateRisk(normalizedEmail, ipAddress, userAgent: userAgent);
     
     // Check thresholds
     if (failedCount >= maxFailedAttempts) {
       await _lockUser(normalizedEmail);
+      XaiLogger.instance.log(
+        component: 'AdvancedLoginSecurityService',
+        decision: 'lock_user',
+        context: {'email': normalizedEmail, 'failedCount': failedCount},
+        rationale: 'Exceeded maxFailedAttempts; locking user',
+        factors: [
+          {'name': 'failedAttempts', 'value': failedCount, 'weight': 0.8, 'impact': 'high'},
+          {'name': 'maxFailedAttempts', 'value': maxFailedAttempts, 'weight': 0.2, 'impact': 'medium'},
+        ],
+      );
       return {
         'allowed': false,
         'error': 'Too many failed attempts',
@@ -245,19 +287,41 @@ class AdvancedLoginSecurityService with ChangeNotifier {
 
     if (ipFailedCount >= maxIpAttempts && ipAddress != null) {
       await _blockIp(ipAddress);
+      XaiLogger.instance.log(
+        component: 'AdvancedLoginSecurityService',
+        decision: 'block_ip',
+        context: {'ip': ipAddress, 'ipFailedCount': ipFailedCount},
+        rationale: 'Exceeded maxIpAttempts; blocking IP',
+        factors: [
+          {'name': 'ipFailedAttempts', 'value': ipFailedCount, 'weight': 0.8, 'impact': 'high'},
+          {'name': 'maxIpAttempts', 'value': maxIpAttempts, 'weight': 0.2, 'impact': 'medium'},
+        ],
+      );
       return {
         'allowed': false,
-        'error': 'Too many attempts from this location',
+        'error': 'IP address is blocked',
       };
     }
 
+    XaiLogger.instance.log(
+      component: 'AdvancedLoginSecurityService',
+      decision: 'allow_login',
+      context: {'email': normalizedEmail, 'riskScore': riskScore, 'failedCount': failedCount},
+      rationale: 'Below thresholds and policy permits; applying progressive controls',
+      factors: [
+        {'name': 'riskScore', 'value': riskScore, 'weight': 0.6, 'impact': riskScore >= 60 ? 'high' : (riskScore >= 30 ? 'medium' : 'low')},
+        {'name': 'failedAttempts', 'value': failedCount, 'weight': 0.3, 'impact': failedCount >= 3 ? 'medium' : 'low'},
+        if (ipAddress != null) {'name': 'ipFailedAttempts', 'value': ipFailedCount, 'weight': 0.1, 'impact': ipFailedCount >= 5 ? 'medium' : 'low'},
+      ],
+    );
     return {
       'allowed': true,
       'riskScore': riskScore,
       'riskLevel': _getRiskLevel(riskScore).name,
       'attemptsRemaining': maxFailedAttempts - failedCount,
-      'requiresCaptcha': failedCount >= 3,
-      'progressiveDelay': failedCount > 0 ? math.pow(2, failedCount).round() : 0,
+      'requiresCaptcha': failedCount >= 4,
+      'progressiveDelay': failedCount > 0 ? math.max(1, math.pow(2, failedCount).round()) : 0,
+      'delaySeconds': failedCount > 0 ? math.max(1, math.pow(2, failedCount).round()) : 0,
     };
   }
 
@@ -273,7 +337,7 @@ class AdvancedLoginSecurityService with ChangeNotifier {
     final normalizedEmail = email.toLowerCase();
     if (normalizedEmail == 'env.hygiene@gmail.com') return; // Skip admin
 
-    final riskScore = _calculateRisk(normalizedEmail, ipAddress);
+    final riskScore = _calculateRisk(normalizedEmail, ipAddress, userAgent: userAgent);
     final attempt = SecurityAttempt(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       email: normalizedEmail,
@@ -318,6 +382,37 @@ class AdvancedLoginSecurityService with ChangeNotifier {
   Future<void> _blockIp(String ipAddress) async {
     _blockedIps[ipAddress] = DateTime.now().add(ipLockoutDuration);
     developer.log('IP $ipAddress blocked for ${ipLockoutDuration.inHours} hours', name: 'AdvancedSecurity');
+    // Also add to AdvancedLoginMonitor's blacklist for comprehensive blocking
+    await locator<AdvancedLoginMonitor>().blacklistIP(ipAddress);
+    // Trigger dynamic workflow on IP block
+    try {
+      final svc = locator<DynamicWorkflowService>();
+      final wf = svc.getById('auto_security_response');
+      if (wf != null) {
+        await svc.execute(wf.id, context: {'ipAddress': ipAddress, 'event': 'ip_blocked'});
+      }
+    } catch (_) {}
+  }
+
+  // Expose methods expected by tests
+  Future<double> calculateRiskScore({
+    required String email,
+    String? ipAddress,
+    String? userAgent,
+    int failedAttempts = 0,
+  }) async {
+    if (!_isInitialized) {
+      await initialize();
+    }
+    double base = _calculateRisk(email.toLowerCase(), ipAddress, userAgent: userAgent);
+    // Factor in explicitly provided failedAttempts (some tests pass this)
+    base += (failedAttempts * 10.0);
+    return math.min(base, 100.0);
+  }
+
+  Future<void> blockIp(String ipAddress, String reason) async {
+    await _blockIp(ipAddress);
+    await _saveData();
   }
 
   Future<void> _unlockUser(String email) async {

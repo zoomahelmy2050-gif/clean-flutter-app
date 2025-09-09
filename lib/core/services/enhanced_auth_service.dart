@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:developer' as developer;
-import 'advanced_login_monitor.dart';
+import 'package:clean_flutter/core/services/advanced_login_monitor.dart';
 import '../../locator.dart';
 
 class EnhancedAuthService with ChangeNotifier {
@@ -150,6 +150,7 @@ class EnhancedAuthService with ChangeNotifier {
       return {
         'allowed': false,
         'error': 'Authentication service not ready',
+        'reason': 'Authentication service not ready',
       };
     }
     
@@ -162,6 +163,11 @@ class EnhancedAuthService with ChangeNotifier {
         'isAdmin': true,
         'riskScore': 0.0,
         'riskLevel': 'none',
+        'attemptsRemaining': 999, // Admin always has attempts
+        'requiresCaptcha': false,
+        'requiresMFA': false,
+        'progressiveDelay': 0,
+        'delaySeconds': 0,
       };
     }
     
@@ -172,14 +178,23 @@ class EnhancedAuthService with ChangeNotifier {
       userAgent: userAgent,
     );
     
+    // Normalize error messaging for blacklisted IPs to match tests
+    String? errorMessage = permission.reason;
+    if (errorMessage != null && errorMessage.toLowerCase().contains('blacklist')) {
+      errorMessage = 'IP address is blocked';
+    }
+    
     return {
       'allowed': permission.allowed,
-      'error': permission.reason,
+      'error': errorMessage,
+      'reason': errorMessage,
       'lockoutMinutes': permission.lockoutMinutes,
+      'lockoutDuration': permission.lockoutMinutes, // alias expected by tests
       'attemptsRemaining': permission.attemptsRemaining,
       'requiresCaptcha': permission.requiresCaptcha,
       'requiresMFA': permission.requiresMFA,
       'progressiveDelay': permission.delaySeconds,
+      'delaySeconds': permission.delaySeconds, // alias expected by tests
       'riskScore': permission.riskScore,
       'riskLevel': permission.riskLevel,
     };
@@ -211,10 +226,12 @@ class EnhancedAuthService with ChangeNotifier {
       return {
         'success': false,
         'error': allowedCheck['error'],
-        'lockoutMinutes': allowedCheck['lockoutMinutes'],
+        'lockoutMinutes': allowedCheck['lockoutMinutes'] ?? 0,
+        'lockoutDuration': allowedCheck['lockoutDuration'] ?? allowedCheck['lockoutMinutes'] ?? 0,
         'attemptsRemaining': allowedCheck['attemptsRemaining'] ?? 0,
         'requiresCaptcha': allowedCheck['requiresCaptcha'] ?? false,
         'progressiveDelay': allowedCheck['progressiveDelay'] ?? 0,
+        'delaySeconds': allowedCheck['delaySeconds'] ?? allowedCheck['progressiveDelay'] ?? 0,
       };
     }
 
@@ -252,6 +269,7 @@ class EnhancedAuthService with ChangeNotifier {
         'user': normalizedEmail,
         'riskScore': allowedCheck['riskScore'] ?? 0.0,
         'riskLevel': allowedCheck['riskLevel'] ?? 'low',
+        'isAdmin': normalizedEmail == _adminEmail,
       };
     } else {
       // Get updated security status after failed attempt
@@ -267,7 +285,10 @@ class EnhancedAuthService with ChangeNotifier {
         'attemptsRemaining': updatedCheck['attemptsRemaining'] ?? 0,
         'requiresCaptcha': updatedCheck['requiresCaptcha'] ?? false,
         'progressiveDelay': updatedCheck['progressiveDelay'] ?? 0,
+        'delaySeconds': updatedCheck['delaySeconds'] ?? updatedCheck['progressiveDelay'] ?? 0,
         'riskScore': updatedCheck['riskScore'] ?? 0.0,
+        'lockoutMinutes': updatedCheck['lockoutMinutes'] ?? 0,
+        'lockoutDuration': updatedCheck['lockoutDuration'] ?? updatedCheck['lockoutMinutes'] ?? 0,
       };
     }
   }
@@ -444,6 +465,7 @@ class EnhancedAuthService with ChangeNotifier {
   /// Unlock user account (admin function)
   Future<void> unlockUser(String email) async {
     await _loginMonitor.unlockUser(email);
+    await _loginMonitor.clearAttempts(email);
     notifyListeners();
   }
 

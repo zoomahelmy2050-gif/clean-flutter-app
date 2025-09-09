@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'api_service.dart';
-import 'backend_service.dart';
-import '../../features/admin/models/incident_response_models.dart';
-import '../../features/admin/models/enhanced_user_management_models.dart';
+import 'package:clean_flutter/core/services/api_service.dart';
+import 'package:clean_flutter/core/services/backend_service.dart';
+import 'package:clean_flutter/features/admin/models/incident_response_models.dart';
+import 'package:clean_flutter/features/admin/models/enhanced_user_management_models.dart';
 
 class AdminDataService extends ChangeNotifier {
   final ApiService apiService;

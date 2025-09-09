@@ -1,11 +1,33 @@
-# Register admin account on backend with Security Center credentials
+# Register admin account on backend with properly formatted v2 password
 $url = "https://clean-flutter-app.onrender.com/auth/register"
+$email = "env.hygiene@gmail.com"
+$password = "password"
+
+# Generate proper v2 password record
+Write-Host "Generating v2 password record..." -ForegroundColor Cyan
+$salt = [System.Security.Cryptography.RandomNumberGenerator]::GetBytes(16)
+$saltB64 = [Convert]::ToBase64String($salt)
+$iterations = 10000
+
+# Compute PBKDF2 key
+$pbkdf2 = New-Object System.Security.Cryptography.Rfc2898DeriveBytes($password, $salt, $iterations)
+$key = $pbkdf2.GetBytes(32)
+
+# Compute HMAC-SHA256 verifier
+$hmac = New-Object System.Security.Cryptography.HMACSHA256($salt)
+$verifier = $hmac.ComputeHash($key)
+$verifierB64 = [Convert]::ToBase64String($verifier)
+
+# Build v2 record using concatenation to avoid colon parsing issues
+$passwordRecordV2 = "v2" + ":" + $saltB64 + ":" + $iterations.ToString() + ":" + $verifierB64
+Write-Host "Generated password record" -ForegroundColor Green
+
 $headers = @{
     "Content-Type" = "application/json"
 }
 $body = @{
-    email = "env.hygiene@gmail.com"
-    passwordRecordV2 = "v2:password"
+    email = $email
+    passwordRecordV2 = $passwordRecordV2
 } | ConvertTo-Json
 
 Write-Host "Registering admin account..." -ForegroundColor Yellow

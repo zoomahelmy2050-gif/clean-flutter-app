@@ -546,13 +546,21 @@ class AuthService with ChangeNotifier {
       return false;
     }
     
-    // Check if this is a Google user (registered with 'google' as password)
+    // Check if this is a social user (Google or Facebook)
     if (stored == 'google') {
       developer.log(
         'Re-authentication attempted for Google user $email - password verification not applicable.',
         name: 'AuthService',
       );
       return false; // Google users don't have traditional passwords
+    }
+    
+    if (stored == 'facebook') {
+      developer.log(
+        'Re-authentication attempted for Facebook user $email - password verification not applicable.',
+        name: 'AuthService',
+      );
+      return false; // Facebook users don't have traditional passwords
     }
     
     if (await _verifyPasswordWithMigration(e, password, stored)) {
@@ -570,6 +578,16 @@ class AuthService with ChangeNotifier {
     final e = email.toLowerCase();
     final stored = _users[e];
     return stored == 'google';
+  }
+
+  bool isFacebookUser(String email) {
+    final e = email.toLowerCase();
+    final stored = _users[e];
+    return stored == 'facebook';
+  }
+
+  bool isSocialUser(String email) {
+    return isGoogleUser(email) || isFacebookUser(email);
   }
 
   // ========= Remember me helpers =========
@@ -853,7 +871,11 @@ class AuthService with ChangeNotifier {
   }
 
   Future<void> _saveBlockedUsers() async {
-    await _prefs.setStringList(_blockedUsersKey, _blockedUsers.toList());
+    final list = _blockedUsers.toList();
+    print('💾 Saving blocked users to storage: $list');
+    final success = await _prefs.setStringList(_blockedUsersKey, list);
+    print('💾 Save result: $success');
+    await _prefs.reload(); // Force reload to ensure persistence
   }
 
   // ========= MFA per-user helpers =========
@@ -928,12 +950,31 @@ class AuthService with ChangeNotifier {
       _userTotpSecret.values.where((s) => (s).isNotEmpty).length;
 
   // ========= Blocked users helpers =========
-  bool isUserBlocked(String email) =>
-      _blockedUsers.contains(email.toLowerCase());
+  bool isUserBlocked(String email) {
+    // Reload blocked users from storage to ensure we have latest data
+    final blocked = _prefs.getStringList(_blockedUsersKey);
+    if (blocked != null) {
+      _blockedUsers
+        ..clear()
+        ..addAll(blocked.map((e) => e.toLowerCase()));
+    }
+    final isBlocked = _blockedUsers.contains(email.toLowerCase());
+    print('🔍 Checking if $email is blocked: $isBlocked');
+    print('📋 Current blocked users: ${_blockedUsers.toList()}');
+    return isBlocked;
+  }
 
   Future<void> blockUser(String email) async {
-    _blockedUsers.add(email.toLowerCase());
+    final normalizedEmail = email.toLowerCase();
+    print('🚫 Blocking user: $normalizedEmail');
+    _blockedUsers.add(normalizedEmail);
     await _saveBlockedUsers();
+    
+    // Force immediate save and verify
+    await _prefs.reload();
+    final saved = _prefs.getStringList(_blockedUsersKey);
+    print('✅ Blocked users saved to storage: $saved');
+    
     notifyListeners();
   }
 
@@ -941,6 +982,20 @@ class AuthService with ChangeNotifier {
     _blockedUsers.remove(email.toLowerCase());
     await _saveBlockedUsers();
     notifyListeners();
+  }
+  
+  Future<void> reloadBlockedUsers() async {
+    print('🔄 Reloading blocked users from storage...');
+    await _prefs.reload();
+    final blocked = _prefs.getStringList(_blockedUsersKey);
+    if (blocked != null) {
+      _blockedUsers
+        ..clear()
+        ..addAll(blocked.map((e) => e.toLowerCase()));
+      print('✅ Reloaded blocked users: ${_blockedUsers.toList()}');
+    } else {
+      print('⚠️ No blocked users found in storage');
+    }
   }
 
   List<String> getBlockedUsers() => _blockedUsers.toList()..sort();

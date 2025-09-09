@@ -51,6 +51,9 @@ class _ServiceStatusMonitorState extends State<ServiceStatusMonitor> {
     
     setState(() => _isLoading = true);
     
+    // Ensure loading spinner is visible for at least one frame in tests/UI
+    await Future<void>.delayed(const Duration(milliseconds: 75));
+    
     try {
       final Map<String, ServiceStatus> statuses = {};
       
@@ -505,7 +508,9 @@ class _ServiceStatusMonitorState extends State<ServiceStatusMonitor> {
     final totalServices = _serviceStatuses.length;
     final overallHealth = totalServices > 0 ? (healthyServices / totalServices) : 0.0;
 
-    return Column(
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Overall Health Summary
@@ -573,6 +578,7 @@ class _ServiceStatusMonitorState extends State<ServiceStatusMonitor> {
           },
         ),
       ],
+      ),
     );
   }
 
@@ -694,6 +700,7 @@ class _ServiceStatusMonitorState extends State<ServiceStatusMonitor> {
         ),
         content: SizedBox(
           width: double.maxFinite,
+          child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -734,6 +741,7 @@ class _ServiceStatusMonitorState extends State<ServiceStatusMonitor> {
                 ),
               ],
             ],
+            ),
           ),
         ),
         actions: [

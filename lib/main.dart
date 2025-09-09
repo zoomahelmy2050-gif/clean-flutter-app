@@ -16,6 +16,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'core/theme/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'features/auth/login_page.dart';
 import 'features/auth/signup_page.dart';
 import 'features/home/home_page.dart';
@@ -28,6 +29,7 @@ import 'features/home/pages/totp_codes_page.dart';
 import 'features/home/pages/add_totp_page.dart';
 import 'package:clean_flutter/locator.dart';
 import 'features/auth/services/auth_service.dart';
+import 'features/auth/services/email_otp_service.dart';
 import 'core/services/hybrid_auth_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/encrypted_storage_service.dart';
@@ -81,6 +83,22 @@ import 'package:clean_flutter/core/services/production_crypto_service.dart';
 import 'package:clean_flutter/core/services/advanced_login_monitor.dart';
 import 'package:clean_flutter/core/services/enhanced_auth_service.dart';
 import 'package:clean_flutter/core/services/rbac_service.dart';
+import 'features/admin/ui/admin_security_center_page.dart';
+import 'features/admin/pages/workflow_builder_page.dart';
+import 'features/admin/pages/anomaly_dashboard_page.dart';
+import 'features/admin/pages/session_graph_page.dart';
+import 'features/admin/services/safe_mode_service.dart';
+import 'features/admin/services/jit_access_service.dart';
+import 'features/admin/services/slo_metrics_service.dart';
+import 'features/admin/services/safety_validation_service.dart';
+import 'features/admin/services/incident_room_service.dart';
+import 'features/admin/services/slack_teams_bridge_service.dart';
+import 'features/admin/pages/incident_rooms_page.dart';
+import 'features/admin/services/pii_redaction_service.dart';
+import 'features/admin/services/dev_sandbox_service.dart';
+import 'features/admin/services/gitops_workflow_service.dart';
+import 'features/admin/widgets/command_palette.dart';
+import 'features/admin/services/saved_views_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -228,9 +246,9 @@ Future<void> main() async {
         ChangeNotifierProvider<TotpManagerService>(
           create: (_) => locator<TotpManagerService>(),
         ),
-        // Provider<EmailOtpService>(
-        //   create: (_) => EmailOtpService(dotenv: dotenv),
-        // ),
+        Provider<EmailOtpService>(
+          create: (_) => EmailOtpService(dotenv: dotenv),
+        ),
         ChangeNotifierProvider<AuthService>(
           create: (_) => locator<AuthService>(),
         ),
@@ -239,6 +257,36 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider<DashboardCustomizationService>(
           create: (_) => locator<DashboardCustomizationService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<SafeModeService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<JitAccessService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<SloMetricsService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<SafetyValidationService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<IncidentRoomService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<SlackTeamsBridgeService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<PiiRedactionService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<DevSandboxService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<GitOpsWorkflowService>(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => locator<SavedViewsService>(),
         ),
         ChangeNotifierProvider<ZeroTrustService>(
           create: (_) => locator<ZeroTrustService>(),
@@ -301,6 +349,9 @@ class MyApp extends StatelessWidget {
           darkTheme: AppTheme.darkTheme,
           themeMode: themeService.themeMode,
           home: initialHome,
+          builder: (context, child) {
+            return GlobalCommandPaletteWrapper(child: child ?? const SizedBox());
+          },
           onGenerateRoute: (settings) {
             if (settings.name == ResetPasswordPage.routeName) {
               final args = settings.arguments as Map<String, String>;
@@ -328,6 +379,10 @@ class MyApp extends StatelessWidget {
             '/add-totp': (_) => const AddTotpPage(),
             '/staff-user-management': (_) => const StaffUserManagementPage(),
             '/superuser-approval': (_) => const SuperuserApprovalDashboard(),
+            '/admin-security-center': (_) => const AdminSecurityCenterPage(),
+            '/workflow-builder': (_) => const WorkflowBuilderPage(),
+            '/anomaly-dashboard': (_) => const AnomalyDashboardPage(),
+            '/session-graph': (_) => const SessionGraphPage(),
             // The ResetPasswordPage requires arguments, so we handle it in onGenerateRoute
             // OtpVerifyPage is created with arguments via MaterialPageRoute where needed
           },

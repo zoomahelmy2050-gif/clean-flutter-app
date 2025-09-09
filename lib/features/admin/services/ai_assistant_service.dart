@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'ai_security_service.dart';
+import '../../../core/services/rbac_service.dart';
+import '../../auth/services/auth_service.dart';
 
 class AIChatMessage {
   final String id;
@@ -34,10 +37,12 @@ class AIContext {
 
 class AIAssistantService extends ChangeNotifier {
   final List<AIChatMessage> _messages = [];
-  final List<AIContext> _contextHistory = [];
+  final List<Map<String, dynamic>> _contextHistory = [];
+  final Map<String, dynamic> _conversationContext = {};
   bool _isTyping = false;
   String _currentModel = 'SecurityAI-v3.0';
   final Map<String, dynamic> _knowledgeBase = {};
+  late final AISecurityService _securityService;
   
   List<AIChatMessage> get messages => List.unmodifiable(_messages);
   bool get isTyping => _isTyping;
@@ -45,6 +50,14 @@ class AIAssistantService extends ChangeNotifier {
   
   AIAssistantService() {
     _initializeKnowledgeBase();
+    _initializeSecurity();
+  }
+  
+  void _initializeSecurity() {
+    _securityService = AISecurityService(
+      rbacService: RBACService(),
+      authService: AuthService(),
+    );
   }
   
   void _initializeKnowledgeBase() {
@@ -97,8 +110,36 @@ class AIAssistantService extends ChangeNotifier {
     // Simulate AI processing
     await Future.delayed(Duration(milliseconds: 500 + Random().nextInt(1500)));
     
-    // Generate AI response
-    final response = await _generateResponse(message);
+    // Check if message contains an action request
+    final actionInfo = _extractActionFromMessage(message);
+    String response;
+    
+    if (actionInfo != null) {
+      // Validate action with security service
+      final validation = await _securityService.validateAction(
+        action: actionInfo['action'],
+        parameters: actionInfo['parameters'] ?? {},
+      );
+      
+      if (validation.isValid) {
+        // Generate AI response for allowed action
+        response = await _generateResponse(message);
+      } else {
+        // Return security denial message
+        response = '⚠️ Security Alert\n\n${validation.message}';
+        if (validation.metadata != null) {
+          if (validation.metadata!['requires_auth'] == true) {
+            response += '\n\nPlease authenticate to perform this action.';
+          }
+          if (validation.metadata!['requires_mfa'] == true) {
+            response += '\n\nThis action requires multi-factor authentication.';
+          }
+        }
+      }
+    } else {
+      // Generate normal response for non-action messages
+      response = await _generateResponse(message);
+    }
     
     final aiMessage = AIChatMessage(
       id: '${DateTime.now().millisecondsSinceEpoch}_ai',
@@ -303,21 +344,54 @@ class AIAssistantService extends ChangeNotifier {
            '- System performance metrics';
   }
   
-  void _updateContext(String query, String response) {
-    _contextHistory.add(AIContext(
-      topic: _categorizeMessage(query),
-      data: {
-        'query': query,
-        'response': response,
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-      timestamp: DateTime.now(),
-    ));
+  void _updateContext(String message, String response) {
+    _conversationContext['lastQuery'] = message;
+    _conversationContext['lastResponse'] = response;
+    _conversationContext['messageCount'] = _messages.length;
+    _conversationContext['lastTimestamp'] = DateTime.now().toIso8601String();
+  }
+  
+  Map<String, dynamic>? _extractActionFromMessage(String message) {
+    final lower = message.toLowerCase();
     
-    // Keep only last 50 context items
-    if (_contextHistory.length > 50) {
-      _contextHistory.removeAt(0);
+    // User management actions
+    if (lower.contains('create user') || lower.contains('add user')) {
+      return {'action': 'create_user', 'parameters': {}};
     }
+    if (lower.contains('delete user') || lower.contains('remove user')) {
+      return {'action': 'delete_user', 'parameters': {}};
+    }
+    if (lower.contains('assign role') || lower.contains('change role')) {
+      return {'action': 'manage_users', 'parameters': {}};
+    }
+    
+    // Security actions
+    if (lower.contains('modify security') || lower.contains('change security settings')) {
+      return {'action': 'modify_security', 'parameters': {}};
+    }
+    if (lower.contains('execute workflow') || lower.contains('run playbook')) {
+      return {'action': 'execute_workflow', 'parameters': {}};
+    }
+    
+    // Data actions
+    if (lower.contains('export') && lower.contains('sensitive')) {
+      return {'action': 'export_sensitive', 'parameters': {}};
+    }
+    if (lower.contains('delete') && (lower.contains('data') || lower.contains('logs'))) {
+      return {'action': 'delete_data', 'parameters': {}};
+    }
+    
+    // Monitoring actions
+    if (lower.contains('start monitoring') || lower.contains('enable monitoring')) {
+      return {'action': 'monitor_system', 'parameters': {}};
+    }
+    
+    // Sync actions
+    if (lower.contains('sync devices') || lower.contains('synchronize')) {
+      return {'action': 'sync_devices', 'parameters': {}};
+    }
+    
+    return null; // No action detected
   }
   
   void clearChat() {
