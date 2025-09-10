@@ -17,7 +17,8 @@ async function bootstrap() {
   
     // Enable CORS
     app.enableCors({
-      origin: (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:4000,https://citizen-fix-admin-dashboard.onrender.com').split(','),
+      origin: true, // Allow any origin
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       credentials: true,
     });
     
