@@ -5,7 +5,7 @@ services:
     plan: free
     rootDirectory: server
     buildCommand: npm install --production=false && npm run prisma:generate && npm run build
-    startCommand: npm start
+    startCommand: npm run start:migrate
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,4 +16,15 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: CORS_ORIGINS
-        value: http://localhost:3000,https://localhost:3000,http://localhost:*,https://clean-flutter-app.onrender.com
+        value: http://localhost:3000,https://localhost:3000,http://localhost:*,http://localhost:4000,https://clean-flutter-app.onrender.com,https://citizen-fix-admin.onrender.com
+
+  - type: web
+    name: citizen-fix-admin
+    runtime: node
+    plan: free
+    rootDirectory: admin-dashboard
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false

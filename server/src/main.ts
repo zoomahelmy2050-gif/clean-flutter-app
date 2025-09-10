@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   try {
@@ -16,9 +17,16 @@ async function bootstrap() {
   
     // Enable CORS
     app.enableCors({
-      origin: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
+      origin: (process.env.CORS_ORIGINS || 'http://localhost:3000,http://localhost:4000,https://citizen-fix-admin-dashboard.onrender.com').split(','),
       credentials: true,
     });
+    
+    // Global DTO validation
+    app.useGlobalPipes(new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: false,
+    }));
   
     const port = process.env.PORT || 3000;
   

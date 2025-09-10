@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module.js';
 import { BlobsModule } from './blobs/blobs.module.js';
 import { MigrationsModule } from './migrations/migrations.module.js';
 import { SyncModule } from './sync/sync.module.js';
+import { ReportsModule } from './reports/reports.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { SyncModule } from './sync/sync.module.js';
     BlobsModule,
     MigrationsModule,
     SyncModule,
+    ReportsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [],

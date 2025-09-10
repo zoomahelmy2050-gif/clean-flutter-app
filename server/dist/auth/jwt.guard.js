@@ -16,7 +16,7 @@ let JwtGuard = class JwtGuard {
     }
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
-        const token = this.extractTokenFromHeader(request);
+        const token = this.extractToken(request);
         if (!token) {
             throw new UnauthorizedException('No token provided');
         }
@@ -29,9 +29,18 @@ let JwtGuard = class JwtGuard {
         }
         return true;
     }
-    extractTokenFromHeader(request) {
-        const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        return type === 'Bearer' ? token : undefined;
+    extractToken(request) {
+        // 1) Authorization: Bearer <token>
+        const [type, headerToken] = request.headers.authorization?.split(' ') ?? [];
+        if (type === 'Bearer' && headerToken)
+            return headerToken;
+        // 2) Query string: ?access_token=... or ?token=...
+        const anyReq = request;
+        const q = anyReq?.query ?? {};
+        const queryToken = q['access_token'] ?? q['token'];
+        if (typeof queryToken === 'string' && queryToken.length > 0)
+            return queryToken;
+        return undefined;
     }
 };
 JwtGuard = __decorate([

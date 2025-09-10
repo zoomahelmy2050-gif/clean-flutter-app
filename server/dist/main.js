@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
+import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
     try {
         console.log('Starting E2EE server...');
@@ -16,6 +17,12 @@ async function bootstrap() {
             origin: (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
             credentials: true,
         });
+        // Global DTO validation
+        app.useGlobalPipes(new ValidationPipe({
+            whitelist: true,
+            transform: true,
+            forbidNonWhitelisted: false,
+        }));
         const port = process.env.PORT || 3000;
         console.log(`Attempting to bind to port ${port}...`);
         await app.listen(port, '0.0.0.0');
