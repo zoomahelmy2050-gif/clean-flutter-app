@@ -2,11 +2,10 @@ import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from '@n
 import { AuthService } from './auth.service.js';
 import { Request } from 'express';
 import { JwtGuard } from './jwt.guard.js';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private auth: AuthService, private jwt: JwtService) {}
+  constructor(private auth: AuthService) {}
 
   @Post('register')
   async register(@Body() body: any) {
@@ -24,15 +23,6 @@ export class AuthController {
   async login(@Body() body: any) {
     const email: string = String(body?.email ?? '').toLowerCase();
     const password: string = String(body?.password ?? '');
-    
-    // Simple admin login for dashboard
-    if (email === 'env.hygiene@gmail.com' && password === 'password') {
-      const payload = { sub: 'admin-user', email: email };
-      const accessToken = await this.jwt.signAsync(payload);
-      return { accessToken };
-    }
-    
-    // Regular user login with v2 records
     const out = await this.auth.login(email, password);
     return out;
   }
