@@ -15,6 +15,11 @@ export class AdminGuard implements CanActivate {
       throw new ForbiddenException('Missing authenticated user');
     }
 
+    // Handle hardcoded admin user
+    if (userId === 'admin-user') {
+      return true;
+    }
+
     const dbUser = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { role: true, isSuperAdmin: true },
