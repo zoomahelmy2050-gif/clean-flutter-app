@@ -15,45 +15,12 @@ async function bootstrap() {
 
     const app = await NestFactory.create(AppModule);
   
-    // Manual CORS headers for preflight (defensive)
-    const expressApp = (app as any).getHttpAdapter().getInstance();
-    expressApp.use((req: any, res: any, next: any) => {
-      res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');
-      res.setHeader('Vary', 'Origin');
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-      res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-      if (req.method === 'OPTIONS') {
-        res.status(204).end();
-        return;
-      }
-      next();
-    });
-  
-    // Enable CORS
-    const corsOrigins = process.env.CORS_ORIGINS 
-      ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
-      : ['http://localhost:3000', 'http://localhost:4000', 'https://citizen-fix-admin-dashboard.onrender.com'];
-  
-    console.log('CORS Origins:', corsOrigins);
-  
+    // Enable CORS - ALLOW ALL ORIGINS TEMPORARILY
     app.enableCors({
-      origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps or Postman)
-        if (!origin) return callback(null, true);
-        
-        if (corsOrigins.includes(origin)) {
-          callback(null, true);
-        } else {
-          console.log(`CORS blocked origin: ${origin}`);
-          callback(null, true); // For now, allow all origins to debug
-        }
-      },
+      origin: '*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-      credentials: true,
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
+      allowedHeaders: '*',
+      credentials: false,
     });
     
     // Global DTO validation
